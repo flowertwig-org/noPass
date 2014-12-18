@@ -1,12 +1,11 @@
 var selectedId = null;
-var profileTypes = [
-    { 'name': 'Facebook', 'hostname': 'facebook.com', 'remindUrl': 'https://www.facebook.com/login/identify?ctx=recover' },
-    { 'name': 'GitHub', 'hostname': 'github.com', 'remindUrl': 'https://github.com/password_reset' },
-    { 'name': 'HBO Nordic', 'hostname': 'hbonordic.com', 'remindUrl': 'http://hbonordic.se/web/hbo/home' },
-    { 'name': 'Loopia', 'hostname': 'loopia.se', 'remindUrl': 'https://www.loopia.se/loggain/losenord/' },
-    { 'name': 'Plex', 'hostname': 'plex.tv', 'remindUrl': 'https://plex.tv/users/password/new' },
-    { 'name': 'Netflix', 'hostname': 'netflix.com', 'remindUrl': 'https://www.netflix.com/LoginHelp' }
-];
+var profileTypes = {};
+profileTypes['Facebook'] = { 'name': 'Facebook', 'hostname': 'facebook.com', 'remindUrl': 'https://www.facebook.com/login/identify?ctx=recover' };
+profileTypes['GitHub'] = { 'name': 'GitHub', 'hostname': 'github.com', 'remindUrl': 'https://github.com/password_reset' };
+profileTypes['HBO Nordic'] = { 'name': 'HBO Nordic', 'hostname': 'hbonordic.com', 'remindUrl': 'http://hbonordic.se/web/hbo/home' };
+profileTypes['Loopia'] = { 'name': 'Loopia', 'hostname': 'loopia.se', 'remindUrl': 'https://www.loopia.se/loggain/losenord/' };
+profileTypes['Plex'] = { 'name': 'Plex', 'hostname': 'plex.tv', 'remindUrl': 'https://plex.tv/users/password/new' };
+profileTypes['Netflix'] = { 'name': 'Netflix', 'hostname': 'netflix.com', 'remindUrl': 'https://www2.netflix.com/LoginHelp' };
 
 var profiles = {};
 var tabs = {};
@@ -14,17 +13,25 @@ var selectedProfile = false;
 var test = false;
 
 function updateProfile(tabId) {
-    chrome.tabs.sendMessage(tabId, profileTypes, function (profileTypeName) {
+    chrome.tabs.sendMessage(tabId, { 'action': 'getProfileType', 'profileTypes': profileTypes }, function (profileTypeName) {
         var profile = getProfile(profileTypeName);
-        tabs[tabId] = profile.name;
-        profiles[profile.name] = profile;
+
         if (!profile) {
             chrome.pageAction.hide(tabId);
         } else {
+            tabs[tabId] = profile.name;
+            profiles[profile.name] = profile;
+
             chrome.pageAction.show(tabId);
             if (selectedId == tabId) {
                 updateSelected(tabId, profile.name);
             }
+        }
+
+        if (profile.stored) {
+            chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': profileTypes[profile.name] }, function (test) {
+                // TODO: Do some crazy stuff here :)                
+            });
         }
     });
 }
@@ -35,9 +42,10 @@ function login(profile) {
             'url': false
         };
 
-        for (var i = 0; i < profileTypes.length; i++) {
-            if (profileTypes[i].name == profile.name) {
-                options.url = profileTypes[i].remindUrl;
+        for (var profileTypeName in profileTypes) {
+            var profileType = profileTypes[profileTypeName];
+            if (profileType.name == profile.name) {
+                options.url = profileType.remindUrl;
             }
         }
 
@@ -50,6 +58,7 @@ function login(profile) {
 
 function saveProfile(profile) {
     if (profile && profile.name) {
+        profile.stored = true;
         localStorage.setItem(profile.name, JSON.stringify(profile));
         profiles[profile.name] = profile;
         // Yes... this is stupid... 
@@ -65,11 +74,18 @@ function getProfile(name) {
     }
 
     if (!profile) {
-        profile = {
-            'name': name
-        };
-        profile.setup = false;
-        profile.userId = false;
+        for (var profileTypeName in profileTypes) {
+            var profileType = profileTypes[profileTypeName];
+            if (profileType.name == name) {
+                profile = {
+                    'name': name,
+                    'stored': false,
+                    'setup': false,
+                    'userId': false
+                };
+            }
+        }
+
     }
 
     return profile;
