@@ -8,7 +8,9 @@
                 "*://*.hbonordic.com/*",
                 "*://*.loopia.se/*",
                 "*://*.plex.tv/*",
-                "*://*.netflix.com/*"
+                "*://*.netflix.com/*",
+                "*://*.linkedin.com/*",
+                "*://*.tele2.se/*"
             ],
             "js": [ "jquery-1.11.1.min.js", "content_script.js" ]
         }
@@ -32,6 +34,5 @@
         "default_popup": "popup.html"
     },
     "version": "0.21",
-    "manifest_version": 2,
-    "content_security_policy": "default-src 'none'; style-src 'self'; script-src 'self'; connect-src https://maps.googleapis.com; img-src https://maps.google.com"
+    "manifest_version": 2
 }
