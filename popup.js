@@ -53,6 +53,7 @@ function map() {
             var backgroundPage = chrome.extension.getBackgroundPage();
             profile = backgroundPage.getProfile(profile.name);
             backgroundPage.login(profile);
+            window.close()
         } catch (ex) {
             var debugElement = document.getElementById('debug');
             debugElement.textContent = ex.toString();
