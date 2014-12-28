@@ -2,6 +2,10 @@
 if (window == top) {
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
         switch (options.action) {
+            case 'resetInfo':
+                //alert('resetInfo:', options);
+                sendResponse(JSON.stringify(options));
+                break;
             case 'getProfileType':
                 var profileTypes = options.profileTypes;
                 var profileType = getProfileType(profileTypes);
@@ -72,6 +76,28 @@ if (window == top) {
                                 window.close();
                             }
                             break;
+                        case "LinkedIn":
+                            var userIdElement = $('#email-requestPasswordReset');
+                            if (userIdElement.length) {
+                                userIdElement.val(profile.userId);
+                                var form = userIdElement.parents('form');
+                                var btn = form.find('[type="submit"]');
+                                btn.click();
+                            } else {
+                                window.close();
+                            }
+                            break;
+                        case "Tele2":
+                            var userIdElement = $('#PasswordRecoveryModel_PasswordRecoveryEmail');
+                            if (userIdElement.length) {
+                                userIdElement.val(profile.userId);
+                                var form = userIdElement.parents('form');
+                                var btn = form.find('[type="submit"]');
+                                btn.click();
+                            } else {
+                                window.close();
+                            }
+                            break;
                         default:
                             break;
                     }
@@ -80,6 +106,7 @@ if (window == top) {
                 sendResponse(isReminder);
                 break;
             default:
+                sendResponse('default result');
                 break;
         }
     });
@@ -94,67 +121,3 @@ var getProfileType = function (profileTypes) {
         }
     }
 }
-
-//// Return null if none is found.
-//var getProfile = function () {
-//    var profile = {
-//        'name': false
-//    };
-
-//    var hostname = document.location.hostname;
-//    if (hostname.indexOf('github.com') >= 0) {
-//        profile.name = "GitHub";
-//    } else if (hostname.indexOf('facebook.com') >= 0) {
-//        profile.name = "Facebook";
-//    } else if (hostname.indexOf('hbonordic.com') >= 0) {
-//        profile.name = "HBO Nordic";
-//    } else if (hostname.indexOf('loopia.se') >= 0) {
-//        profile.name = "Loopia";
-//    } else if (hostname.indexOf('plex.tv') >= 0) {
-//        profile.name = "Plex";
-//    } else if (hostname.indexOf('netflix.com') >= 0) {
-//        profile.name = "Netflix";
-//    }
-
-//    if (profile.name) {
-//        var setup = localStorage.getItem(profile.name + "-setup");
-//        switch (setup) {
-//            case "1":
-//                profile.setup = true;
-//                break;
-//            default:
-//                profile.setup = false;
-//                break;
-//        }
-//        var userId = localStorage.getItem(profile.name + "-user");
-//        if (!userId) {
-//            switch (profile.name) {
-//                case 'GitHub':
-//                    var userId = $('.header-logged-in .css-truncate-target').text();
-//                    if (userId) {
-//                        profile.userId = userId;
-//                    }
-//                    //var elements = document.getElementsByClassName('css-truncate-target');
-//                    //if (elements.length > 0) {
-//                    //    var span = elements[0];
-//                    //    if (!span.children.length) {
-//                    //        profile.userId = elements[0].textContent;
-//                    //    }
-//                    //}
-//                    break;
-//                case 'Facebook':
-//                    //var userId = $('[role="navigation] a._2dpe _1ayn').attr('href');
-//                    var userId = $('[role="navigation]').text();
-//                    if (userId) {
-//                        profile.userId = userId;
-//                    }
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//    }
-
-//    return profile;
-//}
-
