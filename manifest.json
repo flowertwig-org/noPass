@@ -10,7 +10,8 @@
                 "*://*.plex.tv/*",
                 "*://*.netflix.com/*",
                 "*://*.linkedin.com/*",
-                "*://*.tele2.se/*"
+                "*://*.tele2.se/*",
+                "*://*.google.com/*"
             ],
             "js": [ "jquery-1.11.1.min.js", "content_script.js" ]
         }
