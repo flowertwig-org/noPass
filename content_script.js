@@ -2,23 +2,46 @@
 if (window == top) {
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
         switch (options.action) {
-            case 'resetInfo':
-                //alert('resetInfo:', options);
-                sendResponse(JSON.stringify(options));
+            case 'resetSource':
+                debugger;
+                // TODO: As we are opening the tab, we know the id of it... we should match against that instead.
+                if (document.location.toString().indexOf('source=noPass') >= 0) {
+                    // if options.profileType.remindEmailDataSelector is set, use it to find our data...
+                    if (options.profileType.remindEmailDataSelector) {
+                        var link = $(options.profileType.remindEmailDataSelector);
+                        if (link.length) {
+                            var href = link.attr('href');
+                            sendResponse(href);
+                            return;
+                        } else {
+                            // NOT a full email, ignore this,
+                        }
+                    }
+                }
+                sendResponse(false);
                 break;
+            //case 'resetInfo':
+            //    //alert('resetInfo:', options);
+            //    setTimeout(function () { console.error('test'); }, 30 * 1000);
+            //    alert('test');
+
+            //    sendResponse(JSON.stringify(options));
+            //    break;
             case 'getProfileType':
+                // Used to identify site against our profile types (So we know if we support it or not)
                 var profileTypes = options.profileTypes;
                 var profileType = getProfileType(profileTypes);
                 sendResponse(profileType);
                 break;
             case 'profile':
-                console.log('location : ' + document.location);
-                console.log('remindUrl: ' + options.profileType.remindUrl);
+                // Fill out remind of password form.
+                //console.log('location : ' + document.location);
+                //console.log('remindUrl: ' + options.profileType.remindUrl);
                 var isReminder = options.profileType.remindUrl == document.location;
-                console.log("profile0: " + isReminder);
+                //console.log("profile0: " + isReminder);
                 if (isReminder) {
                     var profile = options.profile;
-                    console.log("profile1: " + profile.name);
+                    //console.log("profile1: " + profile.name);
                     switch (profile.name) {
                         case 'Loopia':
                             var userIdElement = $('#i_domain');
@@ -27,9 +50,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         case "Netflix":
                             var userIdElement = $('#email');
@@ -38,9 +60,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         case "Plex":
                             var userIdElement = $('#user_email');
@@ -49,9 +70,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         case "GitHub":
                             var userIdElement = $('#email_field');
@@ -60,9 +80,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         case "Facebook":
                             // TODO: Facebook require more steps...
@@ -72,9 +91,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         case "LinkedIn":
                             var userIdElement = $('#email-requestPasswordReset');
@@ -83,9 +101,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         case "Tele2":
                             var userIdElement = $('#PasswordRecoveryModel_PasswordRecoveryEmail');
@@ -94,9 +111,8 @@ if (window == top) {
                                 var form = userIdElement.parents('form');
                                 var btn = form.find('[type="submit"]');
                                 btn.click();
-                            } else {
-                                window.close();
                             }
+                            sendResponse(true);
                             break;
                         default:
                             break;
@@ -120,4 +136,5 @@ var getProfileType = function (profileTypes) {
             return profileType.name;
         }
     }
+    return false;
 }

@@ -2,59 +2,84 @@
 var profileTypes = {};
 profileTypes['Facebook'] = {
     'name': 'Facebook',
+    'type': 'site',
     'hostname': 'facebook.com',
     'remindEmail': 'password+osscyc69@facebookmail.com',
     'remindEmailHeader': 'Somebody requested a new password for your Facebook account',
+    'remindEmailDataSelector': '',
     'remindUrl': 'https://www.facebook.com/login/identify?ctx=recover'
 };
 profileTypes['GitHub'] = {
     'name': 'GitHub',
+    'type': 'site',
     'hostname': 'github.com',
     'remindEmail': 'noreply@github.com',
     'remindEmailHeader': '[GitHub] Please reset your password',
+    'remindEmailDataSelector': 'a[href*="https://github.com/password_reset/"]',
     'remindUrl': 'https://github.com/password_reset'
 };
 profileTypes['HBO Nordic'] = {
     'name': 'HBO Nordic',
+    'type': 'site',
     'hostname': 'hbonordic.com',
     'remindEmail': '',
     'remindEmailHeader': '',
+    'remindEmailDataSelector': '',
     'remindUrl': 'http://hbonordic.se/web/hbo/home'
 };
 profileTypes['Loopia'] = {
     'name': 'Loopia',
+    'type': 'site',
     'hostname': 'loopia.se',
     'remindEmail': 'support@loopia.se',
     'remindEmailHeader': 'Användaruppgifter - Loopia Kundzon',
+    'remindEmailDataSelector': 'a[href*="https://www.loopia.se/yourpassword"]',
     'remindUrl': 'https://www.loopia.se/loggain/losenord/'
 };
 profileTypes['Plex'] = {
     'name': 'Plex',
+    'type': 'site',
     'hostname': 'plex.tv',
     'remindEmail': '',
     'remindEmailHeader': '',
+    'remindEmailDataSelector': '',
     'remindUrl': 'https://plex.tv/users/password/new'
 };
 profileTypes['Netflix'] = {
     'name': 'Netflix',
+    'type': 'site',
     'hostname': 'netflix.com',
     'remindEmail': '',
     'remindEmailHeader': '',
+    'remindEmailDataSelector': '',
     'remindUrl': 'https://www2.netflix.com/LoginHelp'
 };
 profileTypes['LinkedIn'] = {
     'name': 'LinkedIn',
+    'type': 'site',
     'hostname': 'linkedin.com',
     'remindEmail': '',
     'remindEmailHeader': '',
+    'remindEmailDataSelector': '',
     'remindUrl': 'https://www.linkedin.com/uas/request-password-reset'
 };
 profileTypes['Tele2'] = {
     'name': 'Tele2',
+    'type': 'site',
     'hostname': 'tele2.se',
     'remindEmail': 'noreply@tele2.com',
     'remindEmailHeader': 'Nytt lösenord till Mitt Tele2',
+    'remindEmailDataSelector': '',
     'remindUrl': 'https://www.tele2.se/logga-in/#forgotpassword'
+};
+profileTypes['Gmail'] = {
+    'name': 'Gmail',
+    'type': 'source',
+    'hostname': 'mail.google.com',
+    'remindEmail': '',
+    'remindEmailHeader': '',
+    'remindEmailDataSelector': '',
+    'remindUrl': ''
 };
 
 var profiles = {};
@@ -65,24 +90,55 @@ var mailTimerId = false;
 
 function updateProfile(tabId) {
     chrome.tabs.sendMessage(tabId, { 'action': 'getProfileType', 'profileTypes': profileTypes }, function (profileTypeName) {
-        var profile = getProfile(profileTypeName);
+        if (profileTypeName) {
 
-        if (!profile) {
-            chrome.pageAction.hide(tabId);
-        } else {
-            tabs[tabId] = profile.name;
-            profiles[profile.name] = profile;
+            var selectedProfileType = profileTypes[profileTypeName];
+            switch (selectedProfileType.type) {
+                case 'site':
+                    // If profile type was matching
+                    var profile = getProfile(profileTypeName);
 
-            chrome.pageAction.show(tabId);
-            if (selectedId == tabId) {
-                updateSelected(tabId, profile.name);
+                    if (!profile) {
+                        chrome.pageAction.hide(tabId);
+                    } else {
+                        tabs[tabId] = profile.name;
+                        profiles[profile.name] = profile;
+
+                        chrome.pageAction.show(tabId);
+                        if (selectedId == tabId) {
+                            updateSelected(tabId, profile.name);
+                        }
+                    }
+
+                    if (profile.stored) {
+                        chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': profileTypes[profile.name] }, function (closeWindow) {
+                            if (closeWindow) {
+                                console.error('waiting 10 sec until closing window.');
+                                setTimeout(function () {
+                                    console.error('closing window.');
+                                    chrome.tabs.remove(tabId);
+                                }, 10 * 1000);
+                            }
+                        });
+                    }
+                    break;
+                case 'source':
+                    console.log('Source:', profileTypeName);
+                    // TODO: We are currently sending out Gmail as profile type and not the the profile type that we already know this email is for. We need to fix this...
+                    chrome.tabs.sendMessage(tabId, { 'action': 'resetSource', 'profileType': profileTypes[profileTypeName] }, function (closeWindow) {
+                        if (closeWindow) {
+                            console.error('link in email:', closeWindow);
+                            //console.error('waiting 10 sec until closing window.');
+                            //setTimeout(function () {
+                                console.error('closing window.');
+                                chrome.tabs.remove(tabId);
+                            //}, 10 * 1000);
+                        }
+                    });
+                    break;
+                default:
+                    break;
             }
-        }
-
-        if (profile.stored) {
-            chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': profileTypes[profile.name] }, function (test) {
-                // TODO: Do some crazy stuff here :)                
-            });
         }
     });
 }
@@ -166,9 +222,6 @@ chrome.tabs.onSelectionChanged.addListener(function (tabId, info) {
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     updateProfile(tabs[0].id);
 });
-
-
-
 
 var pollIntervalMin = 1;  // 1 minute
 var pollIntervalMax = 60;  // 1 hour
@@ -311,14 +364,6 @@ function getInboxCount(onSuccess, onError) {
                         chrome.tabs.create({
                             'url': resetEntry.emailLink,
                             'active': false
-                        }, function (tab) {
-                            var createdTabId = tab.id;
-                            console.error('tab', tabs[createdTabId]);
-                            var tmp = resetEntry;
-                            chrome.tabs.sendMessage(createdTabId, { 'action': 'resetInfo', 'entry': resetEntry }, function (test) {
-                                // TODO: Do some crazy stuff here :)
-                                console.warn('resetInfo:', test);
-                            });
                         });
                         console.info('entry', id, title, sender, link);
                     } else {
