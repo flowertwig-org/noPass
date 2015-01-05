@@ -1,5 +1,20 @@
 {
-    "background": { "scripts": [ "background.js" ] },
+    "background": {
+        "scripts": [
+            "sites-start.js", // Supported Sites
+            "site-facebook.com.js",
+            "site-github.com.js",
+            "site-hbonordic.com.js",
+            "site-loopia.se.js",
+            "site-plex.tv.js",
+            "site-netflix.com.js",
+            "site-tele2.se.js",
+            "site-linkedin.com.js",
+            "site-codeproject.com.js",
+            "source-mail.google.com.js", // Supported Sources
+            "background.js"
+        ]
+    },
     "content_scripts": [
         {
             "matches": [
@@ -11,7 +26,23 @@
                 "*://*.netflix.com/*",
                 "*://*.linkedin.com/*",
                 "*://*.tele2.se/*",
-                "*://*.google.com/*"
+                "*://*.google.com/*",
+                "*://*.codeproject.com/*"
+            ],
+            "js": [ "jquery-1.11.1.min.js", "sites/github.com-content_script.js" ]
+        },
+        {
+            "matches": [
+                "*://*.facebook.com/*",
+                "*://*.github.com/*",
+                "*://*.hbonordic.com/*",
+                "*://*.loopia.se/*",
+                "*://*.plex.tv/*",
+                "*://*.netflix.com/*",
+                "*://*.linkedin.com/*",
+                "*://*.tele2.se/*",
+                "*://*.google.com/*",
+                "*://*.codeproject.com/*"
             ],
             "js": [ "jquery-1.11.1.min.js", "content_script.js" ]
         }

@@ -37,7 +37,7 @@ function map() {
             var userId = $('#userid').val();
             if (userId) {
                 var backgroundPage = chrome.extension.getBackgroundPage();
-                profile = backgroundPage.getProfile(profile.name);
+                profile = backgroundPage.getSite(profile.hostname);
                 profile.userId = userId;
                 backgroundPage.saveProfile(profile);
                 window.close();
@@ -51,7 +51,7 @@ function map() {
     $('#login').on('click', function () {
         try {
             var backgroundPage = chrome.extension.getBackgroundPage();
-            profile = backgroundPage.getProfile(profile.name);
+            profile = backgroundPage.getSite(profile.hostname);
             backgroundPage.login(profile);
             window.close()
         } catch (ex) {

@@ -1,117 +1,35 @@
 ﻿var selectedId = null;
-var profileTypes = {};
-profileTypes['Facebook'] = {
-    'name': 'Facebook',
-    'type': 'site',
-    'hostname': 'facebook.com',
-    'remindEmail': 'password+osscyc69@facebookmail.com',
-    'remindEmailHeader': 'Somebody requested a new password for your Facebook account',
-    'remindEmailDataSelector': '',
-    'remindUrl': 'https://www.facebook.com/login/identify?ctx=recover'
-};
-profileTypes['GitHub'] = {
-    'name': 'GitHub',
-    'type': 'site',
-    'hostname': 'github.com',
-    'remindEmail': 'noreply@github.com',
-    'remindEmailHeader': '[GitHub] Please reset your password',
-    'remindEmailDataSelector': 'a[href*="https://github.com/password_reset/"]',
-    'remindUrl': 'https://github.com/password_reset'
-};
-profileTypes['HBO Nordic'] = {
-    'name': 'HBO Nordic',
-    'type': 'site',
-    'hostname': 'hbonordic.com',
-    'remindEmail': '',
-    'remindEmailHeader': '',
-    'remindEmailDataSelector': '',
-    'remindUrl': 'http://hbonordic.se/web/hbo/home'
-};
-profileTypes['Loopia'] = {
-    'name': 'Loopia',
-    'type': 'site',
-    'hostname': 'loopia.se',
-    'remindEmail': 'support@loopia.se',
-    'remindEmailHeader': 'Användaruppgifter - Loopia Kundzon',
-    'remindEmailDataSelector': 'a[href*="https://www.loopia.se/yourpassword"]',
-    'remindUrl': 'https://www.loopia.se/loggain/losenord/'
-};
-profileTypes['Plex'] = {
-    'name': 'Plex',
-    'type': 'site',
-    'hostname': 'plex.tv',
-    'remindEmail': '',
-    'remindEmailHeader': '',
-    'remindEmailDataSelector': '',
-    'remindUrl': 'https://plex.tv/users/password/new'
-};
-profileTypes['Netflix'] = {
-    'name': 'Netflix',
-    'type': 'site',
-    'hostname': 'netflix.com',
-    'remindEmail': '',
-    'remindEmailHeader': '',
-    'remindEmailDataSelector': '',
-    'remindUrl': 'https://www2.netflix.com/LoginHelp'
-};
-profileTypes['LinkedIn'] = {
-    'name': 'LinkedIn',
-    'type': 'site',
-    'hostname': 'linkedin.com',
-    'remindEmail': '',
-    'remindEmailHeader': '',
-    'remindEmailDataSelector': '',
-    'remindUrl': 'https://www.linkedin.com/uas/request-password-reset'
-};
-profileTypes['Tele2'] = {
-    'name': 'Tele2',
-    'type': 'site',
-    'hostname': 'tele2.se',
-    'remindEmail': 'noreply@tele2.com',
-    'remindEmailHeader': 'Nytt lösenord till Mitt Tele2',
-    'remindEmailDataSelector': '',
-    'remindUrl': 'https://www.tele2.se/logga-in/#forgotpassword'
-};
-profileTypes['Gmail'] = {
-    'name': 'Gmail',
-    'type': 'source',
-    'hostname': 'mail.google.com',
-    'remindEmail': '',
-    'remindEmailHeader': '',
-    'remindEmailDataSelector': '',
-    'remindUrl': ''
-};
-
-var profiles = {};
 var tabs = {};
 var selectedProfile = false;
-var test = false;
 var mailTimerId = false;
 
-function updateProfile(tabId) {
-    chrome.tabs.sendMessage(tabId, { 'action': 'getProfileType', 'profileTypes': profileTypes }, function (profileTypeName) {
-        if (profileTypeName) {
+var selectedSource = false;
+var selectedSourceName = false;
 
-            var selectedProfileType = profileTypes[profileTypeName];
-            switch (selectedProfileType.type) {
+function updateProfile(tabId) {
+    chrome.tabs.sendMessage(tabId, { 'action': 'getPageType', 'types': types }, function (pageTypeId) {
+        if (pageTypeId) {
+            var selectedPageType = types[pageTypeId];
+            switch (selectedPageType.type) {
                 case 'site':
                     // If profile type was matching
-                    var profile = getProfile(profileTypeName);
+                    var profile = getSite(selectedPageType.hostname);
 
                     if (!profile) {
                         chrome.pageAction.hide(tabId);
                     } else {
-                        tabs[tabId] = profile.name;
-                        profiles[profile.name] = profile;
+                        tabs[tabId] = profile.hostname;
+                        console.info('updating tab[' + tabId + '] ' + profile.hostname);
+                        sites[profile.hostname] = profile;
 
                         chrome.pageAction.show(tabId);
                         if (selectedId == tabId) {
-                            updateSelected(tabId, profile.name);
+                            updateSelected(tabId, profile.hostname);
                         }
                     }
 
                     if (profile.stored) {
-                        chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': profileTypes[profile.name] }, function (closeWindow) {
+                        chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': availableSites[profile.hostname] }, function (closeWindow) {
                             if (closeWindow) {
                                 console.error('waiting 10 sec until closing window.');
                                 setTimeout(function () {
@@ -123,16 +41,20 @@ function updateProfile(tabId) {
                     }
                     break;
                 case 'source':
-                    console.log('Source:', profileTypeName);
-                    // TODO: We are currently sending out Gmail as profile type and not the the profile type that we already know this email is for. We need to fix this...
-                    chrome.tabs.sendMessage(tabId, { 'action': 'resetSource', 'profileType': profileTypes[profileTypeName] }, function (closeWindow) {
+                    console.log('Source:', selectedPageType);
+                    console.info('Stored ProfileName for Source tab[' + tabId + '] ' + tabs[tabId]);
+                    var tmpProfileTypeName = tabs[tabId];
+
+                    chrome.tabs.sendMessage(tabId, { 'action': 'resetSource', 'profileType': availableSites[tmpProfileTypeName] }, function (closeWindow) {
                         if (closeWindow) {
                             console.error('link in email:', closeWindow);
                             //console.error('waiting 10 sec until closing window.');
                             //setTimeout(function () {
-                                console.error('closing window.');
-                                chrome.tabs.remove(tabId);
+                            console.error('closing window.');
+                            chrome.tabs.remove(tabId);
                             //}, 10 * 1000);
+                        } else {
+                            console.error('nothing returned from resetSource');
                         }
                     });
                     break;
@@ -144,64 +66,73 @@ function updateProfile(tabId) {
 }
 
 function login(profile) {
-    if (profile && profile.name) {
+    if (profile && profile.hostname) {
         var options = {
             'url': false,
             'active': false
         };
 
-        for (var profileTypeName in profileTypes) {
-            var profileType = profileTypes[profileTypeName];
-            if (profileType.name == profile.name) {
-                options.url = profileType.remindUrl;
+        var profileType = false;
+        for (var profileTypeName in availableSites) {
+            var tmpProfileType = availableSites[profileTypeName];
+            if (tmpProfileType.hostname == profile.hostname) {
+                options.url = tmpProfileType.remindUrl;
+                profileType = tmpProfileType;
             }
         }
 
         // https://developer.chrome.com/extensions/tabs#method-create
         chrome.tabs.create(options, function (tab) {
             // TODO: Do stuff after new tab has been open.
+            tabs[tab.id] = profileType.hostname;
+            console.info('updating2 tab[' + tab.id + '] ' + profileType.hostname);
         });
     }
 }
 
 function saveProfile(profile) {
-    if (profile && profile.name) {
+    if (profile && profile.hostname) {
         profile.stored = true;
-        localStorage.setItem(profile.name, JSON.stringify(profile));
-        profiles[profile.name] = profile;
+        localStorage.setItem(profile.hostname, JSON.stringify(profile));
+        sites[profile.hostname] = profile;
         // Yes... this is stupid... 
         selectedProfile = profile;
     }
 }
 
-function getProfile(name) {
-    var profile = false;
-    var tmp = localStorage.getItem(name);
+function getSite(id) {
+    var site = false;
+    var tmp = localStorage.getItem(id);
     if (tmp) {
-        profile = JSON.parse(tmp);
+        site = JSON.parse(tmp);
     }
 
-    if (!profile) {
-        for (var profileTypeName in profileTypes) {
-            var profileType = profileTypes[profileTypeName];
-            if (profileType.name == name) {
-                profile = {
-                    'name': name,
-                    'stored': false,
-                    'setup': false,
-                    'userId': false
-                };
+    if (!site) {
+        site = {
+            'hostname': id,
+            'name': id,
+            'stored': false,
+            'setup': false,
+            'userId': false
+        };
+    }
+
+    for (var siteId in availableSites) {
+        var availableSite = availableSites[siteId];
+        if (availableSite.hostname == id) {
+            for (var propName in availableSite) {
+                site[propName] = availableSite[propName]
             }
+            //site['remindFunction'] = JSON.stringify(availableSite['remindFunction']);
         }
-
     }
 
-    return profile;
+    return site;
 }
 
 function updateSelected(tabId) {
     var profileName = tabs[tabId];
-    selectedProfile = profiles[profileName];
+    selectedProfile = sites[profileName];
     if (selectedProfile) {
         chrome.pageAction.setTitle({ tabId: tabId, title: selectedProfile.name });
     }
@@ -216,6 +147,10 @@ chrome.tabs.onUpdated.addListener(function (tabId, change, tab) {
 chrome.tabs.onSelectionChanged.addListener(function (tabId, info) {
     selectedId = tabId;
     updateSelected(tabId);
+});
+
+chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+    delete tabs[tabId];
 });
 
 // Ensure the current selected tab is set up.
@@ -345,8 +280,8 @@ function getInboxCount(onSuccess, onError) {
                     };
 
                     var found = false;
-                    for (var profileTypeName in profileTypes) {
-                        var profileType = profileTypes[profileTypeName];
+                    for (var profileTypeName in availableSites) {
+                        var profileType = availableSites[profileTypeName];
                         if (profileType.remindEmail === resetEntry.sender) {
                             if (profileType.remindEmailHeader === resetEntry.title) {
                                 resetEntry.profileType = profileType;
@@ -360,14 +295,18 @@ function getInboxCount(onSuccess, onError) {
 
                     if (found) {
                         resetEntries.push(resetEntry);
-
+                        var tmpProfileTypeName = resetEntry.profileType.hostname;
+                        //console.log('tmp:', tmpProfileTypeName);
                         chrome.tabs.create({
                             'url': resetEntry.emailLink,
                             'active': false
+                        }, function (tab) {
+                            tabs[tab.id] = tmpProfileTypeName;
+                            //console.info('updating3 tab[' + tab.id + '] ' + tmpProfileTypeName);
                         });
-                        console.info('entry', id, title, sender, link);
+                        //console.info('entry', id, title, sender, link);
                     } else {
-                        console.log('entry', id, title, sender, link);
+                        //console.log('entry', id, title, sender, link);
                     }
                     //console.log('id: ', id ? id : 'empty');
                     //console.log('title: ', title ? title : 'empty');
@@ -394,15 +333,15 @@ function getInboxCount(onSuccess, onError) {
 }
 
 function scheduleRequest() {
-    console.log('scheduleRequest');
+    //console.log('scheduleRequest');
     var randomness = Math.random() * 2;
     var exponent = Math.pow(2, localStorage.requestFailureCount || 0);
     var multiplier = Math.max(randomness * exponent, 1);
     var delay = Math.min(multiplier * pollIntervalMin, pollIntervalMax);
     delay = Math.round(delay);
-    console.log('Scheduling for: ' + delay);
+    //console.log('Scheduling for: ' + delay);
 
-    console.log('Creating alarm');
+    //console.log('Creating alarm');
     // Use a repeating alarm so that it fires again if there was a problem
     // setting the next alarm.
     chrome.alarms.create('refresh', { periodInMinutes: delay });
@@ -437,14 +376,14 @@ function onWatchdog() {
 }
 
 function onInit() {
-    console.log('onInit');
+    //console.log('onInit');
     localStorage.requestFailureCount = 0;  // used for exponential backoff
     startRequest({ scheduleRequest: true, showLoadingAnimation: true });
     chrome.alarms.create('watchdog', { periodInMinutes: 5 });
 }
 
 function onAlarm(alarm) {
-    console.log('Got alarm', alarm);
+    //console.log('Got alarm', alarm);
     // |alarm| can be undefined because onAlarm also gets called from
     // window.setTimeout on old chrome versions.
     if (alarm && alarm.name == 'watchdog') {
@@ -463,3 +402,35 @@ if (chrome.runtime && chrome.runtime.onStartup) {
         startRequest({ scheduleRequest: false, showLoadingAnimation: false });
     });
 }
+
+function createTypesConfig() {
+    for (var availableSiteId in availableSites) {
+        var availableSite = availableSites[availableSiteId];
+        types[availableSite.hostname] = { 'hostname': availableSite.hostname, 'type': 'site' };
+    }
+
+    for (var availableSourceId in availableSources) {
+        var availableSource = availableSources[availableSourceId];
+        types[availableSource.hostname] = { 'hostname': availableSource.hostname, 'type': 'source' };
+    }
+}
+
+function setSelectedSource(selectedSourceName) {
+    selectedSource = availableSources[selectedSourceName];
+}
+
+function setSelectedSourceName(selectedSourceName) {
+    localStorage.setItem("selectedSource", selectedSourceName);
+    setSelectedSource(selectedSourceName);
+}
+
+var selectedSourceName = localStorage.getItem("selectedSource");
+if (!selectedSourceName) {
+    // https://developer.chrome.com/extensions/tabs#method-create
+    var options = { 'url': chrome.runtime.getURL('setup.html') };
+    chrome.tabs.create(options, function (tab) { });
+} else {
+    setSelectedSource(selectedSourceName);
+}
+
+createTypesConfig();
