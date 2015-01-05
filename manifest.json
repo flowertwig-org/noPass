@@ -1,17 +1,6 @@
 {
     "background": {
         "scripts": [
-            "sites-start.js", // Supported Sites
-            "site-facebook.com.js",
-            "site-github.com.js",
-            "site-hbonordic.com.js",
-            "site-loopia.se.js",
-            "site-plex.tv.js",
-            "site-netflix.com.js",
-            "site-tele2.se.js",
-            "site-linkedin.com.js",
-            "site-codeproject.com.js",
-            "source-mail.google.com.js", // Supported Sources
             "background.js"
         ]
     },
@@ -29,7 +18,7 @@
                 "*://*.google.com/*",
                 "*://*.codeproject.com/*"
             ],
-            "js": [ "jquery-1.11.1.min.js", "sites/github.com-content_script.js" ]
+            "js": [ "jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ]
         },
         {
             "matches": [
@@ -65,6 +54,6 @@
         "default_icon": "marker.png",
         "default_popup": "popup.html"
     },
-    "version": "0.21",
+    "version": "0.22",
     "manifest_version": 2
 }

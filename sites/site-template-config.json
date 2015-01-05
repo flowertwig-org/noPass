@@ -1,0 +1,8 @@
+{
+    "name": "<name to display to user>",
+    "hostname": "<hostname>",
+    "remindEmail": "<email address used to send remind password emails>",
+    "remindEmailHeader": "<email subject for remind password>",
+    "remindEmailDataSelector": "",
+    "remindUrl": "<remind password url>"
+}

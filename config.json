@@ -1,0 +1,14 @@
+{
+    "sites": [
+        "codeproject.com",
+        "facebook.com",
+        "github.com",
+        "hbonordic.com",
+        "linkedin.com",
+        "loopia.se",
+        "netflix.com",
+        "plex.tv",
+        "tele2.se"
+    ],
+    "sources": [ "mail.google.com" ]
+}

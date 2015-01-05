@@ -1,0 +1,8 @@
+{
+    "name": "Plex",
+    "hostname": "plex.tv",
+    "remindEmail": "",
+    "remindEmailHeader": "",
+    "remindEmailDataSelector": "",
+    "remindUrl": "https://plex.tv/users/password/new"
+}

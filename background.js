@@ -1,4 +1,12 @@
-﻿var selectedId = null;
+﻿var availableSites = {};
+var availableSources = {};
+
+var sites = {};
+var sources = {};
+var types = {};
+
+var config = false;
+var selectedId = null;
 var tabs = {};
 var selectedProfile = false;
 var mailTimerId = false;
@@ -403,15 +411,51 @@ if (chrome.runtime && chrome.runtime.onStartup) {
     });
 }
 
-function createTypesConfig() {
-    for (var availableSiteId in availableSites) {
-        var availableSite = availableSites[availableSiteId];
-        types[availableSite.hostname] = { 'hostname': availableSite.hostname, 'type': 'site' };
+function getFileContent(path, onSuccess, onError) {
+    var xhr = new XMLHttpRequest();
+    var abortTimerId = window.setTimeout(function () {
+        xhr.abort();  // synchronously calls onreadystatechange
+    }, requestTimeout);
+
+    function handleSuccess(count) {
+        //localStorage.requestFailureCount = 0;
+        window.clearTimeout(abortTimerId);
+        if (onSuccess)
+            onSuccess(count);
     }
 
-    for (var availableSourceId in availableSources) {
-        var availableSource = availableSources[availableSourceId];
-        types[availableSource.hostname] = { 'hostname': availableSource.hostname, 'type': 'source' };
+    var invokedErrorCallback = false;
+    function handleError() {
+        //++localStorage.requestFailureCount;
+        window.clearTimeout(abortTimerId);
+        if (onError && !invokedErrorCallback)
+            onError();
+        invokedErrorCallback = true;
+    }
+
+    try {
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState != 4)
+                return;
+
+            var data = xhr.responseText;
+            if (data) {
+                handleSuccess(data);
+                return;
+            }
+
+            handleError();
+        };
+
+        xhr.onerror = function (error) {
+            handleError();
+        };
+
+        xhr.open("GET", path, true);
+        xhr.send(null);
+    } catch (e) {
+        console.error("get gmail messages excetion: ", e);
+        handleError();
     }
 }
 
@@ -424,13 +468,47 @@ function setSelectedSourceName(selectedSourceName) {
     setSelectedSource(selectedSourceName);
 }
 
-var selectedSourceName = localStorage.getItem("selectedSource");
-if (!selectedSourceName) {
-    // https://developer.chrome.com/extensions/tabs#method-create
-    var options = { 'url': chrome.runtime.getURL('setup.html') };
-    chrome.tabs.create(options, function (tab) { });
-} else {
-    setSelectedSource(selectedSourceName);
+function initConfig() {
+    var path = chrome.extension.getURL("config.json");
+    getFileContent(path, function (data) {
+        config = JSON.parse(data);
+        // load available sites
+        for (var siteIndex in config.sites) {
+            var siteId = config.sites[siteIndex];
+            var sitePath = chrome.extension.getURL("sites/" + siteId + "-config.json");
+            getFileContent(sitePath, function (siteData) {
+                var site = JSON.parse(siteData);
+                //console.log(site.hostname, siteData);
+                availableSites[site.hostname] = site;
+                types[site.hostname] = { 'hostname': site.hostname, 'type': 'site' };
+            }, function () { });
+        }
+
+        // load sources
+        for (var sourceIndex in config.sources) {
+            var sourceId = config.sources[sourceIndex];
+            var sourcesPath = chrome.extension.getURL("sources/" + sourceId + "-config.json");
+            getFileContent(sourcesPath, function (sourceData) {
+                var source = JSON.parse(sourceData);
+                //console.log(site.hostname, siteData);
+                availableSources[source.hostname] = source;
+                types[source.hostname] = { 'hostname': source.hostname, 'type': 'source' };
+            }, function () { });
+        }
+    }, function () { });
 }
 
-createTypesConfig();
+function init() {
+    initConfig();
+
+    var selectedSourceName = localStorage.getItem("selectedSource");
+    if (!selectedSourceName) {
+        // https://developer.chrome.com/extensions/tabs#method-create
+        var options = { 'url': chrome.runtime.getURL('setup.html') };
+        chrome.tabs.create(options, function (tab) { });
+    } else {
+        setSelectedSource(selectedSourceName);
+    }
+}
+
+init();
