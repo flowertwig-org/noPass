@@ -1,8 +1,7 @@
 {
+   "author": "Mattias Flowertwig",
     "background": {
-        "scripts": [
-            "background.js"
-        ]
+        "scripts": [ "background.js", "sources/mail.google.com-background.js" ]
     },
     "content_scripts": [
         {
@@ -22,7 +21,13 @@
                 "*://*.google.com/*",
                 "*://*.codeproject.com/*"
             ],
-            "js": [ "libs/jquery-1.11.1.min.js", "content_script.js" ]
+            "js": [ "libs/jquery-1.11.1.min.js", "contentscript.js" ]
+        },
+        {
+            "matches": [
+                "*://*.google.com/*"
+            ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sources/mail.google.com-contentscript.js" ]
         }
     ],
     "description": "Extension handling passwords for your, so you don't have to.",
@@ -34,9 +39,7 @@
         "alarms",
         "tabs",
         "webNavigation",
-        "*://*.google.com/",
-        "https://maps.google.com/*",
-        "https://maps.googleapis.com/*"
+        "*://*.google.com/"
     ],
     "page_action": {
         "default_name": "noPass",
