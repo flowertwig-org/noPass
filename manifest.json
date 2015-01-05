@@ -6,19 +6,8 @@
     },
     "content_scripts": [
         {
-            "matches": [
-                "*://*.facebook.com/*",
-                "*://*.github.com/*",
-                "*://*.hbonordic.com/*",
-                "*://*.loopia.se/*",
-                "*://*.plex.tv/*",
-                "*://*.netflix.com/*",
-                "*://*.linkedin.com/*",
-                "*://*.tele2.se/*",
-                "*://*.google.com/*",
-                "*://*.codeproject.com/*"
-            ],
-            "js": [ "jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ]
+            "matches": [ "*://*.github.com/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ]
         },
         {
             "matches": [
@@ -33,12 +22,12 @@
                 "*://*.google.com/*",
                 "*://*.codeproject.com/*"
             ],
-            "js": [ "jquery-1.11.1.min.js", "content_script.js" ]
+            "js": [ "libs/jquery-1.11.1.min.js", "content_script.js" ]
         }
     ],
     "description": "Extension handling passwords for your, so you don't have to.",
     "icons": {
-        "128": "icon_128.png"
+        "128": "resources/img/icon_128.png"
     },
     "name": "noPass",
     "permissions": [
@@ -51,7 +40,7 @@
     ],
     "page_action": {
         "default_name": "noPass",
-        "default_icon": "marker.png",
+        "default_icon": "resources/img/marker.png",
         "default_popup": "popup.html"
     },
     "version": "0.22",
