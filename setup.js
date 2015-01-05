@@ -11,7 +11,7 @@ chrome.runtime.getBackgroundPage(function (backgroundPage) {
 
     // Make select button visible if we have one or more sources for user to choose from.
     if (hasSources) {
-        $('form').css('display', '');
+        $('form').removeClass('hidden');
     }
 
     $('button').on('click', function () {
