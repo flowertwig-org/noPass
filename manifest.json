@@ -43,7 +43,8 @@
         "default_icon": "resources/img/marker.png",
         "default_popup": "popup.html"
     },
-   "options_page": "setup.html",
+    "options_page": "setup.html",
+    "content_security_policy": "default-src 'self'; style-src 'self'; connect-src *; frame-src 'self'",
     "version": "0.22",
     "manifest_version": 2
 }
