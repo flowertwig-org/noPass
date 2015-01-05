@@ -175,7 +175,7 @@ if (window == top) {
                 sendResponse(isReminder);
                 break;
             default:
-                sendResponse('default result');
+                //sendResponse('default result');
                 break;
         }
     });

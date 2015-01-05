@@ -42,7 +42,9 @@ if (window == top) {
                                 // NOT a full email, ignore this,
                             }
                         };
-                        doWhenGmailIsLoaded(work);
+                        setTimeout(function () {
+                            doWhenGmailIsLoaded(work);
+                        }, 2000);
                     }
                 }
                 sendResponse(false);
