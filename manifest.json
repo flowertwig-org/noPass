@@ -1,7 +1,7 @@
 {
    "author": "Mattias Flowertwig",
     "background": {
-        "scripts": [ "background.js", "sources/mail.google.com-background.js" ]
+        "scripts": [ "background-common.js", "background.js", "sources/mail.google.com-background.js" ]
     },
     "content_scripts": [
         {

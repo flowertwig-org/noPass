@@ -14,6 +14,10 @@ var mailTimerId = false;
 var selectedSource = false;
 var selectedSourceName = false;
 
+var pollIntervalMin = 1;  // 1 minute
+var pollIntervalMax = 60;  // 1 hour
+var requestTimeout = 1000 * 2;  // 2 seconds
+
 function updateProfile(tabId) {
     chrome.tabs.sendMessage(tabId, { 'action': 'getPageType', 'types': types }, function (pageTypeId) {
         if (pageTypeId) {
@@ -165,10 +169,6 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     updateProfile(tabs[0].id);
 });
 
-var pollIntervalMin = 1;  // 1 minute
-var pollIntervalMax = 60;  // 1 hour
-var requestTimeout = 1000 * 2;  // 2 seconds
-
 function scheduleRequest() {
     //console.log('scheduleRequest');
     var randomness = Math.random() * 2;
@@ -233,54 +233,6 @@ function onAlarm(alarm) {
         onWatchdog();
     } else {
         startRequest({ scheduleRequest: true, showLoadingAnimation: false });
-    }
-}
-
-function getFileContent(path, onSuccess, onError) {
-    var xhr = new XMLHttpRequest();
-    var abortTimerId = window.setTimeout(function () {
-        xhr.abort();  // synchronously calls onreadystatechange
-    }, requestTimeout);
-
-    function handleSuccess(count) {
-        //localStorage.requestFailureCount = 0;
-        window.clearTimeout(abortTimerId);
-        if (onSuccess)
-            onSuccess(count);
-    }
-
-    var invokedErrorCallback = false;
-    function handleError() {
-        //++localStorage.requestFailureCount;
-        window.clearTimeout(abortTimerId);
-        if (onError && !invokedErrorCallback)
-            onError();
-        invokedErrorCallback = true;
-    }
-
-    try {
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState != 4)
-                return;
-
-            var data = xhr.responseText;
-            if (data) {
-                handleSuccess(data);
-                return;
-            }
-
-            handleError();
-        };
-
-        xhr.onerror = function (error) {
-            handleError();
-        };
-
-        xhr.open("GET", path, true);
-        xhr.send(null);
-    } catch (e) {
-        console.error("get gmail messages excetion: ", e);
-        handleError();
     }
 }
 
