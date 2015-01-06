@@ -14,16 +14,6 @@ if (window == top) {
                 if (isReminder) {
                     var profile = options.profile;
                     switch (profile.name) {
-                        case 'Loopia':
-                            var userIdElement = $('#i_domain');
-                            if (userIdElement.length) {
-                                userIdElement.val(profile.userId);
-                                var form = userIdElement.parents('form');
-                                var btn = form.find('[type="submit"]');
-                                btn.click();
-                            }
-                            sendResponse(true);
-                            break;
                         case "Netflix":
                             var userIdElement = $('#email');
                             if (userIdElement.length) {

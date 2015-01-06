@@ -31,7 +31,7 @@ function updateProfile(tabId) {
                         chrome.pageAction.hide(tabId);
                     } else {
                         tabs[tabId] = profile.hostname;
-                        console.info('updating tab[' + tabId + '] ' + profile.hostname);
+                        //console.info('updating tab[' + tabId + '] ' + profile.hostname);
                         sites[profile.hostname] = profile;
 
                         chrome.pageAction.show(tabId);
@@ -43,32 +43,27 @@ function updateProfile(tabId) {
                     if (profile.stored) {
                         chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': availableSites[profile.hostname] }, function (closeWindow) {
                             if (closeWindow) {
-                                console.error('waiting 10 sec until closing window.');
-                                setTimeout(function () {
-                                    console.error('closing window.');
-                                    chrome.tabs.remove(tabId);
-                                }, 10 * 1000);
+                                if (closeWindow !== true) {
+                                    console.info('password?:', closeWindow);
+                                    profile.pass = closeWindow;
+                                    saveProfile(profile);
+                                    chrome.tabs.update(tabId, { 'url': 'https://www.loopia.se/loggain/' });
+                                } else {
+                                    //console.error('waiting 10 sec until closing window.');
+                                    setTimeout(function () {
+                                        console.error('closing window.');
+                                        chrome.tabs.remove(tabId);
+                                    }, 5 * 1000);
+                                }
                             }
                         });
                     }
                     break;
                 case 'source':
-                    console.log('Source:', selectedPageType);
-                    console.info('Stored ProfileName for Source tab[' + tabId + '] ' + tabs[tabId]);
-                    var tmpProfileTypeName = tabs[tabId];
-
-                    chrome.tabs.sendMessage(tabId, { 'action': 'resetSource', 'profileType': availableSites[tmpProfileTypeName] }, function (closeWindow) {
-                        if (closeWindow) {
-                            console.error('link in email:', closeWindow);
-                            //console.error('waiting 10 sec until closing window.');
-                            //setTimeout(function () {
-                            console.error('closing window.');
-                            chrome.tabs.remove(tabId);
-                            //}, 10 * 1000);
-                        } else {
-                            console.error('nothing returned from resetSource');
-                        }
-                    });
+                    var source = availableSources[selectedPageType.hostname];
+                    if (source) {
+                        source.testing(tabId);
+                    }
                     break;
                 default:
                     break;
@@ -97,7 +92,7 @@ function login(profile) {
         chrome.tabs.create(options, function (tab) {
             // TODO: Do stuff after new tab has been open.
             tabs[tab.id] = profileType.hostname;
-            console.info('updating2 tab[' + tab.id + '] ' + profileType.hostname);
+            //console.info('updating2 tab[' + tab.id + '] ' + profileType.hostname);
         });
     }
 }
@@ -191,17 +186,17 @@ function startRequest(params) {
     if (params && params.scheduleRequest) scheduleRequest();
 
     if (selectedSource) {
-        console.info('refresh was called.');
+        //console.info('refresh was called.');
         selectedSource.refresh(
           function (count) {
-              console.log("success: " + count);
+              //console.log("success: " + count);
           },
           function () {
-              console.log("error!!");
+              //console.log("error!!");
           }
         );
-    } else {
-        console.info('unable to call refresh.');
+    //} else {
+    //    console.info('unable to call refresh.');
     }
 }
 
@@ -271,6 +266,7 @@ function initConfig() {
                 //console.log(site.hostname, siteData);
                 var tmp = availableSources[source.hostname];
                 source.refresh = tmp.refresh;
+                source.testing = tmp.testing;
                 availableSources[source.hostname] = source;
                 types[source.hostname] = { 'hostname': source.hostname, 'type': 'source' };
             }, function () { });

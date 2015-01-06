@@ -13,6 +13,12 @@ function doWhenGmailIsLoaded(callback) {
 if (window == top) {
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
         switch (options.action) {
+            case 'getPageType':
+                // Used to identify site against our profile types (So we know if we support it or not)
+                var types = options.types;
+                var pageType = getPageType(types);
+                sendResponse(pageType);
+                break;
             case 'resetSource':
                 // TODO: As we are opening the tab, we know the id of it... we should match against that instead.
                 if (document.location.toString().indexOf('source=noPass') >= 0) {
@@ -37,7 +43,6 @@ if (window == top) {
                                 //    $(element).text('noPass');
                                 //}
                                 sendResponse(href);
-                                return;
                             } else {
                                 // NOT a full email, ignore this,
                             }
@@ -45,6 +50,7 @@ if (window == top) {
                         setTimeout(function () {
                             doWhenGmailIsLoaded(work);
                         }, 2000);
+                        return true;
                     }
                 }
                 sendResponse(false);
@@ -53,4 +59,15 @@ if (window == top) {
                break;
         }
     });
+}
+
+function getPageType(types) {
+    var hostname = document.location.hostname;
+    for (var typeId in types) {
+        var pageType = types[typeId];
+        if (hostname.indexOf(pageType.hostname) >= 0) {
+            return pageType.hostname;
+        }
+    }
+    return false;
 }

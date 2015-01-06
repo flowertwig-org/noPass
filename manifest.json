@@ -1,5 +1,5 @@
 {
-   "author": "Mattias Flowertwig",
+    "author": "Mattias Flowertwig",
     "background": {
         "scripts": [ "background-common.js", "background.js", "sources/mail.google.com-background.js" ]
     },
@@ -7,6 +7,10 @@
         {
             "matches": [ "*://*.github.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ]
+        },
+        {
+            "matches": [ "*://*.loopia.se/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/loopia.se-contentscript.js" ]
         },
         {
             "matches": [
@@ -18,7 +22,6 @@
                 "*://*.netflix.com/*",
                 "*://*.linkedin.com/*",
                 "*://*.tele2.se/*",
-                "*://*.google.com/*",
                 "*://*.codeproject.com/*"
             ],
             "js": [ "libs/jquery-1.11.1.min.js", "contentscript.js" ]
