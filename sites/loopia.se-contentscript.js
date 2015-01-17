@@ -1,6 +1,16 @@
 // The background page is asking us to find an address on the page.
 if (window == top) {
+
+    $(document).ready(function () {
+        chrome.runtime.sendMessage({
+            'action': 'matched',
+            'hostname': document.location.hostname
+        });
+    });
+
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
+        //$('body').css('color', 'green');
+        //$('body').addClass(options.action);
         switch (options.action) {
             case 'profile':
                 // Fill out remind of password form.

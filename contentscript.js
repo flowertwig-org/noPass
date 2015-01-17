@@ -2,12 +2,12 @@
 if (window == top) {
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
         switch (options.action) {
-            case 'getPageType':
-                // Used to identify site against our profile types (So we know if we support it or not)
-                var types = options.types;
-                var pageType = getPageType(types);
-                sendResponse(pageType);
-                break;
+            //case 'getPageType':
+            //    // Used to identify site against our profile types (So we know if we support it or not)
+            //    var types = options.types;
+            //    var pageType = getPageType(types);
+            //    sendResponse(pageType);
+            //    break;
             case 'profile':
                 // Fill out remind of password form.
                 var isReminder = options.profileType.remindUrl == document.location;
@@ -103,13 +103,13 @@ if (window == top) {
     });
 }
 
-function getPageType(types) {
-    var hostname = document.location.hostname;
-    for (var typeId in types) {
-        var pageType = types[typeId];
-        if (hostname.indexOf(pageType.hostname) >= 0) {
-            return pageType.hostname;
-        }
-    }
-    return false;
-}
+//function getPageType(types) {
+//    var hostname = document.location.hostname;
+//    for (var typeId in types) {
+//        var pageType = types[typeId];
+//        if (hostname.indexOf(pageType.hostname) >= 0) {
+//            return pageType.hostname;
+//        }
+//    }
+//    return false;
+//}

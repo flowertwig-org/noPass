@@ -6,31 +6,34 @@
     "content_scripts": [
         {
             "matches": [ "*://*.github.com/*" ],
-            "js": [ "libs/jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ]
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ],
+            "run_at":  "document_start"
         },
         {
             "matches": [ "*://*.loopia.se/*" ],
-            "js": [ "libs/jquery-1.11.1.min.js", "sites/loopia.se-contentscript.js" ]
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/loopia.se-contentscript.js" ],
+            "run_at":  "document_start"
         },
         {
             "matches": [
                 "*://*.facebook.com/*",
                 "*://*.github.com/*",
                 "*://*.hbonordic.com/*",
-                "*://*.loopia.se/*",
                 "*://*.plex.tv/*",
                 "*://*.netflix.com/*",
                 "*://*.linkedin.com/*",
                 "*://*.tele2.se/*",
                 "*://*.codeproject.com/*"
             ],
-            "js": [ "libs/jquery-1.11.1.min.js", "contentscript.js" ]
+            "js": [ "libs/jquery-1.11.1.min.js", "contentscript.js" ],
+            "run_at":  "document_start"
         },
         {
             "matches": [
                 "*://*.google.com/*"
             ],
-            "js": [ "libs/jquery-1.11.1.min.js", "sources/mail.google.com-contentscript.js" ]
+            "js": [ "libs/jquery-1.11.1.min.js", "sources/mail.google.com-contentscript.js" ],
+            "run_at":  "document_start"
         }
     ],
     "description": "Extension handling passwords for your, so you don't have to.",
@@ -41,6 +44,7 @@
     "permissions": [
         "alarms",
         "tabs",
+        "activeTab",
         "webNavigation",
         "*://*.google.com/"
     ],

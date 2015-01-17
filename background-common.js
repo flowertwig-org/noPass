@@ -1,3 +1,19 @@
+var availableSites = {};
+var availableSources = {};
+
+var sites = {};
+var sources = {};
+var types = {};
+
+var config = false;
+var selectedId = null;
+var tabs = {};
+var selectedProfile = false;
+var mailTimerId = false;
+
+var selectedSource = false;
+var selectedSourceName = false;
+
 function getFileContent(path, onSuccess, onError) {
     var xhr = new XMLHttpRequest();
     var abortTimerId = window.setTimeout(function () {
@@ -42,4 +58,15 @@ function getFileContent(path, onSuccess, onError) {
         console.error("get gmail messages excetion: ", e);
         handleError();
     }
+}
+
+function getPageTypeByHostName(hostname) {
+    //console.log('getPageTypeByHostName', JSON.stringify(types));
+    for (var typeId in types) {
+        var pageType = types[typeId];
+        if (hostname.indexOf(pageType.hostname) >= 0) {
+            return pageType.hostname;
+        }
+    }
+    return false;
 }

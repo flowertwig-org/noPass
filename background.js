@@ -1,27 +1,15 @@
-﻿var availableSites = {};
-var availableSources = {};
-
-var sites = {};
-var sources = {};
-var types = {};
-
-var config = false;
-var selectedId = null;
-var tabs = {};
-var selectedProfile = false;
-var mailTimerId = false;
-
-var selectedSource = false;
-var selectedSourceName = false;
-
-var pollIntervalMin = 1;  // 1 minute
+﻿var pollIntervalMin = 1;  // 1 minute
 var pollIntervalMax = 60;  // 1 hour
 var requestTimeout = 1000 * 2;  // 2 seconds
 
-function updateProfile(tabId) {
-    chrome.tabs.sendMessage(tabId, { 'action': 'getPageType', 'types': types }, function (pageTypeId) {
-        if (pageTypeId) {
+chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
+    var tabId = sender.tab.id;
+    switch (options.action) {
+        case 'matched':
+            var pageTypeId = getPageTypeByHostName(options.hostname);
             var selectedPageType = types[pageTypeId];
+            console.log('message received: ', pageTypeId, JSON.stringify(options));
+
             switch (selectedPageType.type) {
                 case 'site':
                     // If profile type was matching
@@ -68,9 +56,13 @@ function updateProfile(tabId) {
                 default:
                     break;
             }
-        }
-    });
-}
+            break;
+        default:
+            break;
+    }
+});
+
+function updateProfile(tabId) { /* TODO: Depricated function, remove */ }
 
 function login(profile) {
     if (profile && profile.hostname) {
@@ -246,12 +238,12 @@ function initConfig() {
     getFileContent(path, function (data) {
         config = JSON.parse(data);
         // load available sites
+
         for (var siteIndex in config.sites) {
             var siteId = config.sites[siteIndex];
             var sitePath = chrome.extension.getURL("sites/" + siteId + "-config.json");
             getFileContent(sitePath, function (siteData) {
                 var site = JSON.parse(siteData);
-                //console.log(site.hostname, siteData);
                 availableSites[site.hostname] = site;
                 types[site.hostname] = { 'hostname': site.hostname, 'type': 'site' };
             }, function () { });
@@ -300,6 +292,7 @@ chrome.alarms.onAlarm.addListener(onAlarm);
 
 if (chrome.runtime && chrome.runtime.onStartup) {
     chrome.runtime.onStartup.addListener(function () {
+        init();
         console.log('Starting browser... updating icon.');
         startRequest({ scheduleRequest: false, showLoadingAnimation: false });
     });
