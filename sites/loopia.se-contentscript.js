@@ -9,8 +9,6 @@ if (window == top) {
     });
 
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
-        //$('body').css('color', 'green');
-        //$('body').addClass(options.action);
         switch (options.action) {
             case 'profile':
                 // Fill out remind of password form.
@@ -46,7 +44,6 @@ if (window == top) {
                                     var form = userPassElement.parents('form');
                                     var btn = form.find('[type="submit"]');
                                     btn.click();
-                                    //alert(JSON.stringify(profile))
                                 }
                             }
                             sendResponse(true);
@@ -68,7 +65,6 @@ if (window == top) {
                     default:
                         break;
                 }
-                //alert('profile: ' + JSON.stringify(profile));
                 sendResponse(isReminder);
                 break;
             default:

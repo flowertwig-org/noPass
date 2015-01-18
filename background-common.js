@@ -4,11 +4,10 @@ var availableSources = {};
 var sites = {};
 var sources = {};
 var types = {};
+var progress = {};
 
 var config = false;
-var selectedId = null;
 var tabs = {};
-var selectedProfile = false;
 var mailTimerId = false;
 
 var selectedSource = false;

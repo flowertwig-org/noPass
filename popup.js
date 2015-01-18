@@ -1,4 +1,5 @@
 var profile = false;
+var tabId = false;
 
 /**
  * Get the current URL.
@@ -24,27 +25,27 @@ function getCurrentTabUrl(callback) {
 
         // A tab is a plain object that provides information about the tab.
         // See https://developer.chrome.com/extensions/tabs#type-Tab
-        var url = tab.url;
+        //var url = tab.url;
 
         // tab.url is only available if the "activeTab" permission is declared.
         // If you want to see the URL of other tabs (e.g. after removing active:true
         // from |queryInfo|), then the "tabs" permission is required to see their
         // "url" properties.
-        console.assert(typeof url == 'string', 'tab.url should be a string');
+        //console.assert(typeof url == 'string', 'tab.url should be a string');
 
-        callback(url);
+        callback(tab);
     });
 }
 
 function onload() {
     var h1 = document.getElementsByTagName('h1')[0];
     var userIdElement = document.getElementById('userid');
-    var debugElement = document.getElementById('debug');
 
+    // TODO: Convert this to a sendMessage functionality instead (This is so it is easier to see dependency and to have all calls in one place)
     var backgroundPage = chrome.extension.getBackgroundPage();
-    //debugElement.textContent = JSON.stringify(profile) + "\r\n" + JSON.stringify(backgroundPage.selectedProfile) + "\r\n" + new Date().toString();
-    getCurrentTabUrl(function (url) {
-        var pageTypeId = backgroundPage.getPageTypeByHostName(url);
+    getCurrentTabUrl(function (tab) {
+        tabId = tab.id;
+        var pageTypeId = backgroundPage.getPageTypeByHostName(tab.url);
         profile = backgroundPage.getSite(pageTypeId);
 
         if (profile) {
@@ -64,28 +65,30 @@ function onload() {
         try {
             var userId = $('#userid').val();
             if (userId) {
-                var backgroundPage = chrome.extension.getBackgroundPage();
-                profile = backgroundPage.getSite(profile.hostname);
-                profile.userId = userId;
-                backgroundPage.saveProfile(profile);
+                chrome.runtime.sendMessage({
+                    'action': 'updateProfile',
+                    'tabId': tabId,
+                    'userId': userId
+                });
                 window.close();
+
+                //var backgroundPage = chrome.extension.getBackgroundPage();
+                //profile = backgroundPage.getSite(profile.hostname);
+                //profile.userId = userId;
+                //backgroundPage.saveProfile(profile);
+                //window.close();
             }
-        } catch (ex) {
-            var debugElement = document.getElementById('debug');
-            debugElement.textContent = ex.toString();
-        }
+        } catch (ex) { }
     });
 
     $('#login').on('click', function () {
         try {
-            var backgroundPage = chrome.extension.getBackgroundPage();
-            profile = backgroundPage.getSite(profile.hostname);
-            backgroundPage.login(profile);
+            chrome.runtime.sendMessage({
+                'action': 'login',
+                'tabId': tabId
+            });
             window.close()
-        } catch (ex) {
-            var debugElement = document.getElementById('debug');
-            debugElement.textContent = ex.toString();
-        }
+        } catch (ex) { }
     });
 }
 

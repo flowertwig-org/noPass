@@ -2,79 +2,50 @@
 var pollIntervalMax = 60;  // 1 hour
 var requestTimeout = 1000 * 2;  // 2 seconds
 
-chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
-    var tabId = sender.tab.id;
-    switch (options.action) {
-        case 'matched':
-            var pageTypeId = getPageTypeByHostName(options.hostname);
-            var selectedPageType = types[pageTypeId];
-            console.log('message received: ', pageTypeId, JSON.stringify(options));
+function onMatched(hostName, tabId) {
+    var pageTypeId = getPageTypeByHostName(hostName);
+    var selectedPageType = types[pageTypeId];
 
-            switch (selectedPageType.type) {
-                case 'site':
-                    // If profile type was matching
-                    var profile = getSite(selectedPageType.hostname);
+    switch (selectedPageType.type) {
+        case 'site':
+            // If profile type was matching
+            var profile = getSite(selectedPageType.hostname);
 
-                    if (!profile) {
-                        chrome.pageAction.hide(tabId);
-                    } else {
-                        tabs[tabId] = profile.hostname;
-                        //console.info('updating tab[' + tabId + '] ' + profile.hostname);
-                        sites[profile.hostname] = profile;
+            if (!profile) {
+                chrome.pageAction.hide(tabId);
+            } else {
+                tabs[tabId] = profile.hostname;
+                sites[profile.hostname] = profile;
 
-                        chrome.pageAction.show(tabId);
-                        if (selectedId == tabId) {
-                            updateSelected(tabId, profile.hostname);
-                        }
-                    }
-
-                    if (profile.stored) {
-                        chrome.tabs.sendMessage(tabId, { 'action': 'profile', 'profile': profile, 'profileType': availableSites[profile.hostname] }, function (closeWindow) {
-                            if (closeWindow) {
-                                if (closeWindow !== true) {
-                                    console.info('password?:', closeWindow);
-                                    profile.pass = closeWindow;
-                                    saveProfile(profile);
-                                    chrome.tabs.update(tabId, { 'url': 'https://www.loopia.se/loggain/' });
-                                } else {
-                                    //console.error('waiting 10 sec until closing window.');
-                                    setTimeout(function () {
-                                        console.error('closing window.');
-                                        chrome.tabs.remove(tabId);
-                                    }, 5 * 1000);
-                                }
-                            }
-                        });
-                    }
-                    break;
-                case 'source':
-                    var source = availableSources[selectedPageType.hostname];
-                    if (source) {
-                        source.testing(tabId);
-                    }
-                    break;
-                default:
-                    break;
+                chrome.pageAction.show(tabId);
+            }
+            break;
+        case 'source':
+            var source = availableSources[selectedPageType.hostname];
+            if (source) {
+                source.testing(tabId);
             }
             break;
         default:
             break;
     }
-});
+}
 
-function updateProfile(tabId) { /* TODO: Depricated function, remove */ }
+function onLogin(tabId) {
+    var hostname = tabs[tabId];
+    var site = getSite(hostname);
 
-function login(profile) {
-    if (profile && profile.hostname) {
+    if (site && site.hostname) {
         var options = {
             'url': false,
             'active': false
         };
+        progress[site.hostname] = { 'status': 'login', 'sourceTabId': tabId };
 
         var profileType = false;
         for (var profileTypeName in availableSites) {
             var tmpProfileType = availableSites[profileTypeName];
-            if (tmpProfileType.hostname == profile.hostname) {
+            if (tmpProfileType.hostname == site.hostname) {
                 options.url = tmpProfileType.remindUrl;
                 profileType = tmpProfileType;
             }
@@ -84,10 +55,44 @@ function login(profile) {
         chrome.tabs.create(options, function (tab) {
             // TODO: Do stuff after new tab has been open.
             tabs[tab.id] = profileType.hostname;
-            //console.info('updating2 tab[' + tab.id + '] ' + profileType.hostname);
         });
     }
 }
+
+// update site profile and stores it
+function onUpdateProfile(tabId, userId) {
+    var hostname = tabs[tabId];
+    var site = getSite(hostname);
+
+    if (site && site.hostname) {
+        site.userId = userId;
+        saveProfile(site);
+    }
+}
+
+// listening on actions from popup and contentscripts
+chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
+    var tabId = false;
+    if (sender.tab) {
+        // Calls from tabs
+        tabId = sender.tab.id;
+    } else {
+        // Calls from popup
+        tabId = options.tabId;
+    }
+
+    switch (options.action) {
+        case 'matched':
+            onMatched(options.hostname, tabId);
+            break;
+        case 'login':
+            onLogin(tabId);
+            break;
+        case 'updateProfile':
+            onUpdateProfile(tabId, options.userId);
+            break;
+    }
+});
 
 function saveProfile(profile) {
     if (profile && profile.hostname) {
@@ -95,7 +100,6 @@ function saveProfile(profile) {
         localStorage.setItem(profile.hostname, JSON.stringify(profile));
         sites[profile.hostname] = profile;
         // Yes... this is stupid... 
-        selectedProfile = profile;
     }
 }
 
@@ -128,44 +132,22 @@ function getSite(id) {
     return site;
 }
 
-function updateSelected(tabId) {
-    var profileName = tabs[tabId];
-    selectedProfile = sites[profileName];
-    if (selectedProfile) {
-        chrome.pageAction.setTitle({ tabId: tabId, title: selectedProfile.name });
-    }
-}
-
-chrome.tabs.onUpdated.addListener(function (tabId, change, tab) {
-    if (change.status == "complete") {
-        updateProfile(tabId);
-    }
-});
-
 chrome.tabs.onSelectionChanged.addListener(function (tabId, info) {
     selectedId = tabId;
-    updateSelected(tabId);
+    //updateSelected(tabId);
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
     delete tabs[tabId];
 });
 
-// Ensure the current selected tab is set up.
-chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    updateProfile(tabs[0].id);
-});
-
 function scheduleRequest() {
-    //console.log('scheduleRequest');
     var randomness = Math.random() * 2;
     var exponent = Math.pow(2, localStorage.requestFailureCount || 0);
     var multiplier = Math.max(randomness * exponent, 1);
     var delay = Math.min(multiplier * pollIntervalMin, pollIntervalMax);
     delay = Math.round(delay);
-    //console.log('Scheduling for: ' + delay);
 
-    //console.log('Creating alarm');
     // Use a repeating alarm so that it fires again if there was a problem
     // setting the next alarm.
     chrome.alarms.create('refresh', { periodInMinutes: delay });
@@ -178,7 +160,6 @@ function startRequest(params) {
     if (params && params.scheduleRequest) scheduleRequest();
 
     if (selectedSource) {
-        //console.info('refresh was called.');
         selectedSource.refresh(
           function (count) {
               //console.log("success: " + count);
@@ -187,8 +168,6 @@ function startRequest(params) {
               //console.log("error!!");
           }
         );
-    //} else {
-    //    console.info('unable to call refresh.');
     }
 }
 
@@ -206,14 +185,12 @@ function onWatchdog() {
 
 function onInit() {
     init();
-    //console.log('onInit');
     localStorage.requestFailureCount = 0;  // used for exponential backoff
     startRequest({ scheduleRequest: true, showLoadingAnimation: true });
     chrome.alarms.create('watchdog', { periodInMinutes: 5 });
 }
 
 function onAlarm(alarm) {
-    //console.log('Got alarm', alarm);
     // |alarm| can be undefined because onAlarm also gets called from
     // window.setTimeout on old chrome versions.
     if (alarm && alarm.name == 'watchdog') {
@@ -255,7 +232,7 @@ function initConfig() {
             var sourcesPath = chrome.extension.getURL("sources/" + sourceId + "-config.json");
             getFileContent(sourcesPath, function (sourceData) {
                 var source = JSON.parse(sourceData);
-                //console.log(site.hostname, siteData);
+
                 var tmp = availableSources[source.hostname];
                 source.refresh = tmp.refresh;
                 source.testing = tmp.testing;
@@ -293,7 +270,6 @@ chrome.alarms.onAlarm.addListener(onAlarm);
 if (chrome.runtime && chrome.runtime.onStartup) {
     chrome.runtime.onStartup.addListener(function () {
         init();
-        console.log('Starting browser... updating icon.');
         startRequest({ scheduleRequest: false, showLoadingAnimation: false });
     });
 }
