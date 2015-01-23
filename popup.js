@@ -84,7 +84,7 @@ function onload() {
     $('#login').on('click', function () {
         try {
             chrome.runtime.sendMessage({
-                'action': 'login',
+                'action': 'remindPass',
                 'tabId': tabId
             });
             window.close()

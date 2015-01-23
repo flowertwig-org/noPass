@@ -5,6 +5,45 @@ if (window == top) {
         chrome.runtime.sendMessage({
             'action': 'matched',
             'hostname': document.location.hostname
+        }, function (options) {
+            var profile = options.profile;
+            var progress = options.progress;
+
+            if (!progress) {
+                return;
+            }
+
+            switch (progress.status) {
+                case 'remindPass':
+                    var address = '' + document.location;
+                    var isReminder = profile.remindUrl == address;
+                    if (isReminder) {
+                        var userIdElement = $('#i_domain');
+                        if (userIdElement.length) {
+                            userIdElement.val(profile.userId);
+                            var form = userIdElement.parents('form');
+                            var btn = form.find('[type="submit"]');
+
+                            chrome.runtime.sendMessage({
+                                'action': 'remindPassSubmit',
+                                'hostname': document.location.hostname
+                            }, function () {
+                                btn.click();
+                            });
+                        }
+                    }
+                    break;
+                case 'remindPassSubmit':
+                    var address = '' + document.location;
+                    var isReminder = profile.remindUrl == address;
+                    chrome.runtime.sendMessage({
+                        'action': 'remindPassSubmited'
+                    });
+                    break;
+                case 'remindPassSubmited':
+                    break;
+            }
+            console.log('matched', JSON.stringify(arguments));
         });
     });
 

@@ -2,22 +2,25 @@
 var pollIntervalMax = 60;  // 1 hour
 var requestTimeout = 1000 * 2;  // 2 seconds
 
-function onMatched(hostName, tabId) {
+function onMatched(hostName, tabId, sendResponse) {
     var pageTypeId = getPageTypeByHostName(hostName);
     var selectedPageType = types[pageTypeId];
 
     switch (selectedPageType.type) {
         case 'site':
-            // If profile type was matching
-            var profile = getSite(selectedPageType.hostname);
+            // If site type was matching
+            var site = getSite(selectedPageType.hostname);
 
-            if (!profile) {
+            if (!site) {
                 chrome.pageAction.hide(tabId);
             } else {
-                tabs[tabId] = profile.hostname;
-                sites[profile.hostname] = profile;
+                tabs[tabId] = site.hostname;
+                sites[site.hostname] = site;
 
                 chrome.pageAction.show(tabId);
+
+                var test = progress[site.hostname];
+                sendResponse({ 'profile': site, 'progress': test });
             }
             break;
         case 'source':
@@ -40,7 +43,7 @@ function onLogin(tabId) {
             'url': false,
             'active': false
         };
-        progress[site.hostname] = { 'status': 'login', 'sourceTabId': tabId };
+        progress[site.hostname] = { 'status': 'remindPass', 'sourceTabId': tabId };
 
         var profileType = false;
         for (var profileTypeName in availableSites) {
@@ -55,8 +58,25 @@ function onLogin(tabId) {
         chrome.tabs.create(options, function (tab) {
             // TODO: Do stuff after new tab has been open.
             tabs[tab.id] = profileType.hostname;
+            progress[site.hostname]['currentTab'] = tab.id;
         });
     }
+}
+
+function onRemindPassSubmit(tabId, sendResponse) {
+    var hostname = tabs[tabId];
+    var site = getSite(hostname);
+
+    if (site && site.hostname) {
+        progress[site.hostname]['status'] = 'remindPassSubmit';
+        sendResponse();
+    }
+}
+
+function onRemindPassSubmitted(tabId) {
+    chrome.tabs.remove(tabId);
+    var hostname = tabs[tabId];
+    progress[hostname]['status'] = 'remindPassSubmited';
 }
 
 // update site profile and stores it
@@ -70,6 +90,23 @@ function onUpdateProfile(tabId, userId) {
     }
 }
 
+function onOpenTab(tabId, url, sendResponse) {
+    var options = {
+        'url': url,
+        'active': false
+    };
+
+    // https://developer.chrome.com/extensions/tabs#method-create
+    chrome.tabs.create(options, function (tab) {
+        sendResponse(tab);
+    });
+}
+
+function onCloseTab(tabId, sendResponse) {
+    chrome.tabs.remove(tabId);
+    sendResponse();
+}
+
 // listening on actions from popup and contentscripts
 chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
     var tabId = false;
@@ -81,16 +118,41 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
         tabId = options.tabId;
     }
 
+    // action: openTab, removeTab, changeStatus, updateProfile
+
     switch (options.action) {
         case 'matched':
-            onMatched(options.hostname, tabId);
+            onMatched(options.hostname, tabId, sendResponse);
+            return true;
+            //break;
+        case 'openTab':
+            onOpenTab(tabId, options.url, sendResponse);
             break;
-        case 'login':
-            onLogin(tabId);
+        case 'closeTab':
+            onCloseTab(tabId, sendResponse);
             break;
         case 'updateProfile':
-            onUpdateProfile(tabId, options.userId);
+            onUpdateProfile(tabId, options.userId, sendResponse);
             break;
+        case 'remindPass':
+            // 1. open remindPass url
+            // 2. change status
+            onLogin(tabId, sendResponse);
+            break;
+        case 'remindPassSubmit':
+            // 1. change status
+            onRemindPassSubmit(tabId, sendResponse);
+            return true;
+            //break;
+        case 'remindPassSubmited':
+            // 1. Close tab
+            // 2. change status
+            onRemindPassSubmitted(tabId);
+            break;
+        case 'updateProfile':
+            onUpdateProfile(tabId, options.userId, sendResponse);
+            return true;
+            //break;
     }
 });
 
