@@ -13,6 +13,12 @@ if (window == top) {
                 return;
             }
 
+            // If tab id doesn't match we are not interested (This is to make sure we are not changing any of the tabs our user is using
+            if (progress.currentTab != options.tabId) {
+                return;
+            }
+            console.log('same tab');
+
             switch (progress.status) {
                 case 'remindPass':
                     var address = '' + document.location;
@@ -25,8 +31,8 @@ if (window == top) {
                             var btn = form.find('[type="submit"]');
 
                             chrome.runtime.sendMessage({
-                                'action': 'remindPassSubmit',
-                                'hostname': document.location.hostname
+                                'action': 'updateStatus',
+                                'status': 'remindPassSubmit'
                             }, function () {
                                 btn.click();
                             });
@@ -36,11 +42,88 @@ if (window == top) {
                 case 'remindPassSubmit':
                     var address = '' + document.location;
                     var isReminder = profile.remindUrl == address;
-                    chrome.runtime.sendMessage({
-                        'action': 'remindPassSubmited'
-                    });
+
+                    if (isReminder) {
+                        chrome.runtime.sendMessage({
+                            'action': 'updateStatus',
+                            'status': 'remindPassSubmited'
+                        }, function () {
+                            chrome.runtime.sendMessage({
+                                'action': 'closeTab',
+                                'status': 'remindPassSubmited',
+                                'tabId': progress.currentTab
+                            });
+                        });
+                    }
                     break;
                 case 'remindPassSubmited':
+                    var address = '' + document.location;
+                    if (address.indexOf('/yourpassword/') >= 0) {
+                        $('.userinfo-chars').each(function () {
+                            var $this = $(this);
+                            var txt = $this.parent('li').text();
+                            if (txt.indexOf('senord') >= 0) {
+                                chrome.runtime.sendMessage({
+                                    'action': 'updateData',
+                                    'data': $this.text()
+                                }, function () {
+                                    chrome.runtime.sendMessage({
+                                        'action': 'updateStatus',
+                                        'status': 'changeDefaultPass'
+                                    }, function () {
+                                        document.location.assign('https://www.loopia.se/loggain/');
+                                    });
+                                });
+                            }
+                        });
+                    }
+                    break;
+                case 'changeDefaultPass':
+                    var address = '' + document.location;
+                    if (address.indexOf('/loggain/') >= 0) {
+                        var userIdElement = $('#i_username');
+                        if (userIdElement.length) {
+                            userIdElement.val(profile.userId);
+                            var userPassElement = $('#i_password');
+                            if (userPassElement.length) {
+                                userPassElement.val(progress.data);
+                                var form = userPassElement.parents('form');
+                                var btn = form.find('[type="submit"]');
+                                chrome.runtime.sendMessage({
+                                    'action': 'updateStatus',
+                                    'status': 'changeDefaultPass2'
+                                });
+                                btn.click();
+                            }
+                        }
+                    }
+                    break;
+                case 'changeDefaultPass2':
+                    chrome.runtime.sendMessage({
+                        'action': 'updateStatus',
+                        'status': 'changeDefaultPass3'
+                    }, function () {
+                        document.location.assign('https://customerzone.loopia.se/account/');
+                    });
+                    break;
+                case 'changeDefaultPass3':
+                    var address = '' + document.location;
+                    if (address.indexOf("/account/") >= 0) {
+                        var userPassElement = $('#loopia_account_password_password');
+                        if (userPassElement.length) {
+
+                            chrome.runtime.sendMessage({
+                                'action': 'updateStatus',
+                                'status': 'PassSet'
+                            }, function () {
+                                // TODO: Generate password
+                                userPassElement.val("N0tSoStrongPassw0rd");
+                                var form = userPassElement.parents('form');
+                                var btn = form.find('[type="submit"]');
+                                btn.click();
+                            });
+                        }
+                    }
                     break;
             }
             console.log('matched', JSON.stringify(arguments));
@@ -49,6 +132,9 @@ if (window == top) {
 
     chrome.extension.onMessage.addListener(function (options, sender, sendResponse) {
         switch (options.action) {
+            case 'sourceMatch':
+                console.log('action');
+                break;
             case 'profile':
                 // Fill out remind of password form.
                 var profile = options.profile;

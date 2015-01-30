@@ -20,7 +20,7 @@ function onMatched(hostName, tabId, sendResponse) {
                 chrome.pageAction.show(tabId);
 
                 var test = progress[site.hostname];
-                sendResponse({ 'profile': site, 'progress': test });
+                sendResponse({ 'profile': site, 'progress': test, 'tabId': tabId });
             }
             break;
         case 'source':
@@ -31,6 +31,26 @@ function onMatched(hostName, tabId, sendResponse) {
             break;
         default:
             break;
+    }
+}
+
+function onUpdateStatus(tabId, status, sendResponse) {
+    // Content script should only be able to update their own status
+    var hostname = tabs[tabId];
+    progress[hostname]['status'] = status;
+    if (sendResponse && typeof (sendResponse) === 'function') {
+        sendResponse();
+    }
+}
+
+function onUpdateData(tabId, data, sendResponse) {
+    console.log('onUpdateData');
+    // Content script should only be able to update their own data
+    var hostname = tabs[tabId];
+    progress[hostname]['data'] = data;
+    if (sendResponse && typeof (sendResponse) === 'function') {
+        console.log('onUpdateData', data);
+        sendResponse();
     }
 }
 
@@ -63,21 +83,11 @@ function onLogin(tabId) {
     }
 }
 
-function onRemindPassSubmit(tabId, sendResponse) {
-    var hostname = tabs[tabId];
-    var site = getSite(hostname);
-
-    if (site && site.hostname) {
-        progress[site.hostname]['status'] = 'remindPassSubmit';
-        sendResponse();
-    }
-}
-
-function onRemindPassSubmitted(tabId) {
-    chrome.tabs.remove(tabId);
-    var hostname = tabs[tabId];
-    progress[hostname]['status'] = 'remindPassSubmited';
-}
+//function onRemindPassSubmitted(tabId) {
+//    chrome.tabs.remove(tabId);
+//    var hostname = tabs[tabId];
+//    progress[hostname]['status'] = 'remindPassSubmited';
+//}
 
 // update site profile and stores it
 function onUpdateProfile(tabId, userId) {
@@ -103,6 +113,7 @@ function onOpenTab(tabId, url, sendResponse) {
 }
 
 function onCloseTab(tabId, sendResponse) {
+    delete tabs[tabId];
     chrome.tabs.remove(tabId);
     sendResponse();
 }
@@ -129,25 +140,24 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
             onOpenTab(tabId, options.url, sendResponse);
             break;
         case 'closeTab':
-            onCloseTab(tabId, sendResponse);
+            onCloseTab(options.tabId, sendResponse);
             break;
         case 'updateProfile':
             onUpdateProfile(tabId, options.userId, sendResponse);
             break;
-        case 'remindPass':
+        case 'updateStatus':
+            onUpdateStatus(tabId, options.status, sendResponse);
+            break;
+        case 'updateData':
+            onUpdateData(tabId, options.data, sendResponse);
+            break;
+        case 'login':
             // 1. open remindPass url
             // 2. change status
             onLogin(tabId, sendResponse);
             break;
-        case 'remindPassSubmit':
-            // 1. change status
-            onRemindPassSubmit(tabId, sendResponse);
-            return true;
-            //break;
-        case 'remindPassSubmited':
-            // 1. Close tab
-            // 2. change status
-            onRemindPassSubmitted(tabId);
+        case 'genPass':
+            onGeneratePassword(tabId, sendResponse);
             break;
         case 'updateProfile':
             onUpdateProfile(tabId, options.userId, sendResponse);
