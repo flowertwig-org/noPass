@@ -83,12 +83,6 @@ function onLogin(tabId) {
     }
 }
 
-//function onRemindPassSubmitted(tabId) {
-//    chrome.tabs.remove(tabId);
-//    var hostname = tabs[tabId];
-//    progress[hostname]['status'] = 'remindPassSubmited';
-//}
-
 // update site profile and stores it
 function onUpdateProfile(tabId, userId) {
     var hostname = tabs[tabId];
@@ -128,8 +122,6 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
         // Calls from popup
         tabId = options.tabId;
     }
-
-    // action: openTab, removeTab, changeStatus, updateProfile
 
     switch (options.action) {
         case 'matched':
