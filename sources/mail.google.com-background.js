@@ -139,6 +139,8 @@
                                 'active': false
                             }, function (tab) {
                                 tabs[tab.id] = tmpProfileTypeName;
+                                // Update value for current Tab
+                                progress[tmpProfileTypeName]['currentTab'] = tab.id;
                                 //console.info('updating3 tab[' + tab.id + '] ' + tmpProfileTypeName);
                             });
                             //console.info('entry', id, title, sender, link);
