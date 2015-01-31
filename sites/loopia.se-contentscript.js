@@ -112,26 +112,31 @@ if (window == top) {
                         var userPassElement = $('#loopia_account_password_password');
                         if (userPassElement.length) {
 
+                            // TODO: use settings for provider as input to genPass (Like password length and if it allows symbols)
                             chrome.runtime.sendMessage({
-                                'action': 'updateStatus',
-                                'status': 'passwordSet'
-                            }, function () {
-                                // TODO: Generate password
-                                userPassElement.val("N0tSoStrongPassw0rd2");
-                                var form = userPassElement.parents('form');
-                                var btn = form.find('[type="submit"]');
-                                btn.click();
+                                'action': 'genPass'
+                            }, function (pass) {
+                                chrome.runtime.sendMessage({
+                                    'action': 'updateStatus',
+                                    'status': 'passwordSet'
+                                }, function () {
+                                    userPassElement.val(pass);
+                                    var form = userPassElement.parents('form');
+                                    var btn = form.find('[type="submit"]');
+                                    btn.click();
 
-                                var currentTab = progress.currentTab;
-                                // TODO: Using a timeout is just stupid, change it...
-                                // TODO: Update sourceTab (as we are now logged in)
-                                setTimeout(function () {
-                                    chrome.runtime.sendMessage({
-                                        'action': 'closeTab',
-                                        'status': 'done',
-                                        'tabId': currentTab
-                                    });
-                                }, 1000);
+                                    var currentTab = progress.currentTab;
+                                    // TODO: Using a timeout is just stupid, change it...
+                                    // TODO: Update sourceTab (as we are now logged in)
+                                    // TODO: remove progress information (as we are now done with logging in and changing password)
+                                    setTimeout(function () {
+                                        chrome.runtime.sendMessage({
+                                            'action': 'closeTab',
+                                            'status': 'done',
+                                            'tabId': currentTab
+                                        });
+                                    }, 1000);
+                                });
                             });
                         }
                     }

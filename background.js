@@ -112,6 +112,11 @@ function onCloseTab(tabId, sendResponse) {
     sendResponse();
 }
 
+function onGeneratePassword(tabId, length, useLowercase, useUppercase, useNumbers, useSymbols, sendResponse) {
+    var pass = genPass(length, useLowercase, useUppercase, useNumbers, useSymbols);
+    sendResponse(pass);
+}
+
 // listening on actions from popup and contentscripts
 chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
     var tabId = false;
@@ -149,7 +154,12 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
             onLogin(tabId, sendResponse);
             break;
         case 'genPass':
-            onGeneratePassword(tabId, sendResponse);
+            var length = options.length || 60;  // Use 60 as default length.
+            var useLowercase = options.useLowercase || true;
+            var useUppercase = options.useUppercase || true;
+            var useNumbers = options.useNumbers || true;
+            var useSymbols = options.useSymbols || true;
+            onGeneratePassword(tabId, length, useLowercase, useUppercase, useNumbers, useSymbols, sendResponse);
             break;
         case 'updateProfile':
             onUpdateProfile(tabId, options.userId, sendResponse);
