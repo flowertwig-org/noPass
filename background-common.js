@@ -69,3 +69,69 @@ function getPageTypeByHostName(hostname) {
     }
     return false;
 }
+
+function complexify(alphabet, f, pass) {
+    var d = Math.floor(Math.random() * alphabet.length);
+    var c = Math.floor(Math.random() * f);
+    var pass = pass.substring(0, c) + alphabet.substring(d, d + 1) + pass.substring(c, f);
+    return pass;
+}
+
+/****
+ * Generate Password
+ * length           -   Password length (6-2048)
+ * useSymbols       -   Use symbols (0|1)
+ * useLowercase     -   Use lowercase chars (0|1)
+ * useUppercase     -   Use uppercase chars (0|1)
+ * useNumbers       -   User numbers (0|1)
+ ****/
+function genPass(length, useLowercase, useUppercase, useNumbers, useSymbols) {
+    var lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
+    var uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var numbers = "0123456789";
+    var symbols = "|!#$%&*+-=?@^_{}[]()\/'\"`~,;:.<>\\";
+    var alphabet = "";
+    var g = 0;
+    if (useLowercase) {
+        alphabet += lowercaseChars;
+        g++;
+    }
+    if (useUppercase) {
+        alphabet += uppercaseChars;
+        g++;
+    }
+    if (useNumbers) {
+        alphabet += numbers;
+        g++;
+    }
+    if (useSymbols) {
+        alphabet += symbols;
+        g++;
+    }
+    if (g == 0) {
+        return "";
+    }
+    var alphabetLength = alphabet.length;
+    var f = length - g;
+    var pass = "";
+    for (var e = 0; e < f; e++) {
+        var b = Math.floor(Math.random() * alphabetLength);
+        pass += alphabet.substring(b, b + 1);
+    }
+    if (useUppercase) {
+        pass = complexify(uppercaseChars, f, pass);
+        f++;
+    }
+    if (useLowercase) {
+        pass = complexify(lowercaseChars, f, pass);
+        f++;
+    }
+    if (useNumbers) {
+        pass = complexify(numbers, f, pass);
+        f++;
+    }
+    if (useSymbols) {
+        pass = complexify(symbols, f, pass);
+    }
+    return pass;
+}
