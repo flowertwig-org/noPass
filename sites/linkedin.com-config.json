@@ -1,8 +1,11 @@
 {
     "name": "LinkedIn",
     "hostname": "linkedin.com",
-    "remindEmail": "",
-    "remindEmailHeader": "",
-    "remindEmailDataSelector": "",
+    "remindEmail": "security-noreply@linkedin.com",
+    "remindEmailHeader": "here's the link to reset your password",
+    "remindEmailHeaderMatch": "contains",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='https://www.linkedin.com/e/rpp/']",
     "remindUrl": "https://www.linkedin.com/uas/request-password-reset"
 }

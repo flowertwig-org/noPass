@@ -15,6 +15,11 @@
             "run_at":  "document_start"
         },
         {
+            "matches": [ "*://*.linkedin.com/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/linkedin.com-contentscript.js" ],
+            "run_at":  "document_start"
+        },
+        {
             "matches": [
                 "*://*.facebook.com/*",
                 "*://*.github.com/*",
@@ -22,6 +27,7 @@
                 "*://*.plex.tv/*",
                 "*://*.netflix.com/*",
                 "*://*.linkedin.com/*",
+                "*://*.loopia.se/*",
                 "*://*.tele2.se/*",
                 "*://*.codeproject.com/*"
             ],
