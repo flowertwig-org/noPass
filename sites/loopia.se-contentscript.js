@@ -17,7 +17,6 @@ if (window == top) {
             if (progress.currentTab != options.tabId) {
                 return;
             }
-            console.log('same tab');
 
             switch (progress.status) {
                 case 'remindPass':
@@ -50,7 +49,6 @@ if (window == top) {
                         }, function () {
                             chrome.runtime.sendMessage({
                                 'action': 'closeTab',
-                                'status': 'remindPassSubmited',
                                 'tabId': progress.currentTab
                             });
                         });
@@ -127,7 +125,6 @@ if (window == top) {
 
                                     var currentTab = progress.currentTab;
                                     // TODO: Using a timeout is just stupid, change it...
-                                    // TODO: Update sourceTab (as we are now logged in)
                                     // TODO: remove progress information (as we are now done with logging in and changing password)
                                     setTimeout(function () {
 
@@ -141,22 +138,6 @@ if (window == top) {
                     }
                     break;
             }
-            console.log('matched', JSON.stringify(arguments));
         });
-    });
-
-    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-        console.log('onMessage');
-        switch (msg.action) {
-            case 'loginDone':
-                if (confirm('noPass login process finished.\r\nYou need to refresh page to be logged in.\r\nClick "OK" to refresh page.')) {
-                    document.location.reload();
-                }
-                break;
-            default:
-                break;
-        }
-
-        sendResponse();
     });
 }
