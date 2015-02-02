@@ -44,12 +44,10 @@ function onUpdateStatus(tabId, status, sendResponse) {
 }
 
 function onUpdateData(tabId, data, sendResponse) {
-    console.log('onUpdateData');
     // Content script should only be able to update their own data
     var hostname = tabs[tabId];
     progress[hostname]['data'] = data;
     if (sendResponse && typeof (sendResponse) === 'function') {
-        console.log('onUpdateData', data);
         sendResponse();
     }
 }
@@ -109,12 +107,31 @@ function onOpenTab(tabId, url, sendResponse) {
 function onCloseTab(tabId, sendResponse) {
     delete tabs[tabId];
     chrome.tabs.remove(tabId);
-    sendResponse();
+    if (sendResponse && typeof (sendResponse) === 'function') {
+        sendResponse();
+    }
 }
 
 function onGeneratePassword(tabId, length, useLowercase, useUppercase, useNumbers, useSymbols, sendResponse) {
     var pass = genPass(length, useLowercase, useUppercase, useNumbers, useSymbols);
     sendResponse(pass);
+}
+
+function onLoginDone(tabId, sendResponse) {
+    console.log('onLoginDone');
+    var hostname = tabs[tabId];
+    var sourceTabId = progress[hostname]['sourceTabId'];
+    var currentTabId = progress[hostname]['currentTab'];
+
+    console.log('onLoginDone', sourceTabId, currentTabId);
+
+    onCloseTab(currentTabId);
+    console.log('onLoginDone.sendMessage');
+    chrome.tabs.sendMessage(sourceTabId, { 'action': 'loginDone' });
+    console.log('onLoginDone.sendMessage done');
+    if (sendResponse && typeof (sendResponse) === 'function') {
+        sendResponse();
+    }
 }
 
 // listening on actions from popup and contentscripts
@@ -165,6 +182,9 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
             onUpdateProfile(tabId, options.userId, sendResponse);
             return true;
             //break;
+        case 'loginDone':
+            onLoginDone(tabId, sendResponse);
+            break;
     }
 });
 

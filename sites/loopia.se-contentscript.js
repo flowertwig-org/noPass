@@ -130,10 +130,9 @@ if (window == top) {
                                     // TODO: Update sourceTab (as we are now logged in)
                                     // TODO: remove progress information (as we are now done with logging in and changing password)
                                     setTimeout(function () {
+
                                         chrome.runtime.sendMessage({
-                                            'action': 'closeTab',
-                                            'status': 'done',
-                                            'tabId': currentTab
+                                            'action': 'loginDone'
                                         });
                                     }, 1000);
                                 });
@@ -141,15 +140,23 @@ if (window == top) {
                         }
                     }
                     break;
-                case 'passwordSet':
-                    chrome.runtime.sendMessage({
-                        'action': 'closeTab',
-                        'status': 'done',
-                        'tabId': progress.currentTab
-                    });
-                    break
             }
             console.log('matched', JSON.stringify(arguments));
         });
+    });
+
+    chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+        console.log('onMessage');
+        switch (msg.action) {
+            case 'loginDone':
+                if (confirm('noPass login process finished.\r\nYou need to refresh page to be logged in.\r\nClick "OK" to refresh page.')) {
+                    document.location.reload();
+                }
+                break;
+            default:
+                break;
+        }
+
+        sendResponse();
     });
 }
