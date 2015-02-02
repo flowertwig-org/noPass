@@ -3,6 +3,7 @@
     "hostname": "loopia.se",
     "remindEmail": "support@loopia.se",
     "remindEmailHeader": "Användaruppgifter - Loopia Kundzon",
+    "remindEmailHeaderMatch": "equal",
     "remindEmailDataType": "element",
     "remindEmailDataAttribute": "href",
     "remindEmailDataSelector": "a[href*='https://www.loopia.se/yourpassword']",

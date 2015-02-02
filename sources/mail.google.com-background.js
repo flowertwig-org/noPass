@@ -120,11 +120,21 @@
                         for (var profileTypeName in availableSites) {
                             var profileType = availableSites[profileTypeName];
                             if (profileType.remindEmail === resetEntry.sender) {
-                                if (profileType.remindEmailHeader === resetEntry.title) {
-                                    resetEntry.profileType = profileType;
-                                    found = true;
-                                    //} else {
-                                    //    console.log(profileType.remindEmailHeader + ' === ' + resetEntry.title);
+                                switch (profileType.remindEmailHeaderMatch) {
+                                    case 'contains':
+                                        if (resetEntry.title.indexOf(profileType.remindEmailHeader) >= 0) {
+                                            resetEntry.profileType = profileType;
+                                            found = true;
+                                        }
+                                        break;
+                                    case 'equal':
+                                        if (profileType.remindEmailHeader === resetEntry.title) {
+                                            resetEntry.profileType = profileType;
+                                            found = true;
+                                        }
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 break;
                             }
