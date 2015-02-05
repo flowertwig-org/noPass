@@ -70,6 +70,45 @@ function getPageTypeByHostName(hostname) {
     return false;
 }
 
+function updateStepAndStatus(p, step, status) {
+    if (!p) {
+        return;
+    }
+
+    var sourceTabId = p['sourceTabId'];
+
+    var statusName = '';
+    switch (status) {
+        default:
+        case 0:
+            break;
+        case 1:
+            statusName = 'starting';
+            break;
+        case 2:
+            statusName = 'completed';
+            break;
+        case 3:
+            statusName = 'failed';
+            break;
+    }
+
+    switch (step) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            chrome.pageAction.setIcon({ 'tabId': sourceTabId, 'path': '/resources/img/logo-step' + step + '-' + statusName + '.png' });
+            break;
+        default:
+            // Invalid status, reset icon
+            chrome.pageAction.setIcon({ 'tabId': sourceTabId, 'path': '/resources/img/logo.png' });
+            break;
+    }
+
+
+}
+
 function complexify(alphabet, f, pass) {
     var d = Math.floor(Math.random() * alphabet.length);
     var c = Math.floor(Math.random() * f);

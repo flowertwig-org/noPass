@@ -26,7 +26,7 @@ function onMatched(hostName, tabId, sendResponse) {
         case 'source':
             var source = availableSources[selectedPageType.hostname];
             if (source) {
-                source.testing(tabId);
+                source.init(tabId);
             }
             break;
         default:
@@ -72,11 +72,19 @@ function onLogin(tabId) {
             }
         }
 
+        // Update pageAction icon
+        updateStepAndStatus(progress[site.hostname], 1, 1);
+
         // https://developer.chrome.com/extensions/tabs#method-create
         chrome.tabs.create(options, function (tab) {
             // TODO: Do stuff after new tab has been open.
             tabs[tab.id] = profileType.hostname;
             progress[site.hostname]['currentTab'] = tab.id;
+
+            // initiate a refresh interval
+            if (selectedSource) {
+                selectedSource.refresh();
+            }
         });
     }
 }
@@ -129,10 +137,26 @@ function onLoginDone(tabId, sendResponse) {
     console.log('onLoginDone.sendMessage');
     chrome.tabs.sendMessage(sourceTabId, { 'action': 'loginDone' });
     console.log('onLoginDone.sendMessage done');
+
+    chrome.runtime.sendMessage({
+        'action': 'iconUpdate',
+        'step': 4,
+        'status': 2
+    });
+
     if (sendResponse && typeof (sendResponse) === 'function') {
         sendResponse();
     }
 }
+
+function onIconUpdate(tabId, step, status, sendResponse) {
+    var hostname = tabs[tabId];
+    var p = progress[hostname];
+
+    updateStepAndStatus(p, step, status);
+    sendResponse();
+}
+
 
 // listening on actions from popup and contentscripts
 chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
@@ -184,6 +208,9 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
             //break;
         case 'loginDone':
             onLoginDone(tabId, sendResponse);
+            break;
+        case 'iconUpdate':
+            onIconUpdate(tabId, options.step, options.status, sendResponse);
             break;
     }
 });
@@ -254,14 +281,15 @@ function startRequest(params) {
     if (params && params.scheduleRequest) scheduleRequest();
 
     if (selectedSource) {
-        selectedSource.refresh(
-          function (count) {
-              //console.log("success: " + count);
-          },
-          function () {
-              //console.log("error!!");
-          }
-        );
+        selectedSource.refresh();
+        //selectedSource.refresh(
+        //  function (count) {
+        //      //console.log("success: " + count);
+        //  },
+        //  function () {
+        //      //console.log("error!!");
+        //  }
+        //);
     }
 }
 
@@ -329,7 +357,7 @@ function initConfig() {
 
                 var tmp = availableSources[source.hostname];
                 source.refresh = tmp.refresh;
-                source.testing = tmp.testing;
+                source.init = tmp.init;
                 availableSources[source.hostname] = source;
                 types[source.hostname] = { 'hostname': source.hostname, 'type': 'source' };
             }, function () { });

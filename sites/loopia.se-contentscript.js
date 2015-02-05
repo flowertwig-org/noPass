@@ -55,6 +55,11 @@ if (window == top) {
                     }
                     break;
                 case 'remindPassSubmited':
+                    chrome.runtime.sendMessage({
+                        'action': 'iconUpdate',
+                        'step': 3,
+                        'status': 1
+                    });
                     var address = '' + document.location;
                     if (address.indexOf('/yourpassword/') >= 0) {
                         $('.userinfo-chars').each(function () {
@@ -105,6 +110,11 @@ if (window == top) {
                     });
                     break;
                 case 'changeDefaultPass3':
+                    chrome.runtime.sendMessage({
+                        'action': 'iconUpdate',
+                        'step': 4,
+                        'status': 1
+                    });
                     var address = '' + document.location;
                     if (address.indexOf("/account/") >= 0) {
                         var userPassElement = $('#loopia_account_password_password');

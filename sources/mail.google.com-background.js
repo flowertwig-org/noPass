@@ -6,7 +6,7 @@
     function getFeedUrl() {
         // "zx" is a Gmail query parameter that is expected to contain a random
         // string and may be ignored/stripped.
-        return getGmailUrl() + "feed/atom?zx=noPass"; // + encodeURIComponent(getInstanceId());
+        return getGmailUrl() + "feed/atom?zx=noPass";
     }
 
     function gmailNSResolver(prefix) {
@@ -15,7 +15,7 @@
         }
     }
 
-    function getInboxCount(onSuccess, onError) {
+    function refresh(onSuccess, onError) {
         var xhr = new XMLHttpRequest();
         var abortTimerId = window.setTimeout(function () {
             xhr.abort();  // synchronously calls onreadystatechange
@@ -140,10 +140,13 @@
                             }
                         }
 
-                        if (found) {
+                        var isAlreadyInProgress = resetEntry.id in localStorage;
+
+                        if (found && !isAlreadyInProgress) {
                             resetEntries.push(resetEntry);
                             var tmpProfileTypeName = resetEntry.profileType.hostname;
                             //console.log('tmp:', tmpProfileTypeName);
+                            localStorage.setItem(resetEntry.id, '1');
                             chrome.tabs.create({
                                 'url': resetEntry.emailLink,
                                 'active': false
@@ -151,6 +154,9 @@
                                 tabs[tab.id] = tmpProfileTypeName;
                                 // Update value for current Tab
                                 progress[tmpProfileTypeName]['currentTab'] = tab.id;
+
+                                // Update pageAction icon
+                                updateStepAndStatus(progress[tmpProfileTypeName], 2, 1);
                                 //console.info('updating3 tab[' + tab.id + '] ' + tmpProfileTypeName);
                             });
                             //console.info('entry', id, title, sender, link);
@@ -181,8 +187,8 @@
         }
     }
 
-    function testing(tabId) {
-        console.log('testing called', tabId);
+    function onTabInit(tabId) {
+        console.log('init called', tabId);
         var tmpProfileTypeName = tabs[tabId];
         if (tmpProfileTypeName) {
 
@@ -193,11 +199,6 @@
                     // TODO: let content script return what type it found..
                     console.info('link in email:', closeWindow);
                     chrome.tabs.update(tabId, { 'url': closeWindow });
-                    //console.error('waiting 10 sec until closing window.');
-                    //setTimeout(function () {
-                    //console.error('closing window.');
-                    //chrome.tabs.remove(tabId);
-                    //}, 10 * 1000);
                 } else {
                     console.error('nothing returned from resetSource');
                 }
@@ -206,8 +207,8 @@
     }
 
     var source = availableSources["mail.google.com"] || {};
-    source.refresh = getInboxCount;
-    source.testing = testing;
+    source.refresh = refresh;
+    source.init = onTabInit;
     availableSources["mail.google.com"] = source;
     
 })(availableSources);
