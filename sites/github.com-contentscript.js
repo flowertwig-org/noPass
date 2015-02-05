@@ -17,7 +17,7 @@ if (window == top) {
             if (progress.currentTab != options.tabId) {
                 return;
             }
-            //console.log('same tab');
+            console.log('same tab');
 
             switch (progress.status) {
                 case 'remindPass':
@@ -47,39 +47,41 @@ if (window == top) {
                     break;
                 case 'changeDefaultPass':
                     var address = '' + document.location;
-                    if (address.indexOf('/password_reset/') >= 0) {
+                    if (address.indexOf('/password_reset') >= 0) {
                         chrome.runtime.sendMessage({
                             'action': 'genPass'
                         }, function (pass) {
 
                             var userPassElements = $('#password,#password_confirmation');
-                            userPassElements.val(pass);
+                            if (userPassElements.length) {
+                                userPassElements.val(pass);
 
-                            chrome.runtime.sendMessage({
-                                'action': 'updateData',
-                                'data': pass
-                            }, function () {
                                 chrome.runtime.sendMessage({
-                                    'action': 'updateStatus',
-                                    'status': 'login'
+                                    'action': 'updateData',
+                                    'data': pass
                                 }, function () {
-                                    var form = userPassElements.parents('form');
-                                    var btn = form.find('[type="submit"]');
-                                    btn.click();
-                                    setTimeout(function () {
-                                        chrome.runtime.sendMessage({
-                                            'action': 'closeTab',
-                                            'tabId': progress.currentTab
-                                        });
-                                    }, 1000);
+                                    chrome.runtime.sendMessage({
+                                        'action': 'updateStatus',
+                                        'status': 'loginInfo'
+                                    }, function () {
+                                        var form = userPassElements.parents('form');
+                                        var btn = form.find('[type="submit"]');
+                                        btn.click();
+                                        setTimeout(function () {
+                                            chrome.runtime.sendMessage({
+                                                'action': 'closeTab',
+                                                'tabId': progress.currentTab
+                                            });
+                                        }, 1000);
+                                    });
                                 });
-                            });
+                            }
                         });
                     }
                     break;
-                case 'login':
+                case 'loginInfo':
                     var address = '' + document.location;
-                    if (address.indexOf('/login/') >= 0) {
+                    if (address.indexOf('/login') >= 0) {
                         var userIdElement = $('#login_field');
                         if (userIdElement.length) {
                             userIdElement.val(profile.userId);
