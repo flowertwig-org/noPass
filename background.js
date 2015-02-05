@@ -34,6 +34,25 @@ function onMatched(hostName, tabId, sendResponse) {
     }
 }
 
+function onSourceRefresh(hostName, tabId, sendResponse) {
+    if (selectedSource) {
+        selectedSource.refresh();
+    }
+    //var pageTypeId = getPageTypeByHostName(hostName);
+    //var selectedPageType = types[pageTypeId];
+
+    //switch (selectedPageType.type) {
+    //    case 'source':
+    //        var source = availableSources[selectedPageType.hostname];
+    //        if (source) {
+    //            source.refresh();
+    //        }
+    //        break;
+    //    default:
+    //        break;
+    //}
+}
+
 function onUpdateStatus(tabId, status, sendResponse) {
     // Content script should only be able to update their own status
     var hostname = tabs[tabId];
@@ -77,7 +96,6 @@ function onLogin(tabId) {
 
         // https://developer.chrome.com/extensions/tabs#method-create
         chrome.tabs.create(options, function (tab) {
-            // TODO: Do stuff after new tab has been open.
             tabs[tab.id] = profileType.hostname;
             progress[site.hostname]['currentTab'] = tab.id;
 
@@ -126,17 +144,12 @@ function onGeneratePassword(tabId, length, useLowercase, useUppercase, useNumber
 }
 
 function onLoginDone(tabId, sendResponse) {
-    console.log('onLoginDone');
     var hostname = tabs[tabId];
     var sourceTabId = progress[hostname]['sourceTabId'];
     var currentTabId = progress[hostname]['currentTab'];
 
-    console.log('onLoginDone', sourceTabId, currentTabId);
-
     onCloseTab(currentTabId);
-    console.log('onLoginDone.sendMessage');
     chrome.tabs.sendMessage(sourceTabId, { 'action': 'loginDone' });
-    console.log('onLoginDone.sendMessage done');
 
     chrome.runtime.sendMessage({
         'action': 'iconUpdate',
@@ -170,6 +183,9 @@ chrome.runtime.onMessage.addListener(function (options, sender, sendResponse) {
     }
 
     switch (options.action) {
+        case 'sourceRefresh':
+            onSourceRefresh(options.hostname, tabId, sendResponse);
+            break;
         case 'matched':
             onMatched(options.hostname, tabId, sendResponse);
             return true;
@@ -255,7 +271,6 @@ function getSite(id) {
 
 chrome.tabs.onSelectionChanged.addListener(function (tabId, info) {
     selectedId = tabId;
-    //updateSelected(tabId);
 });
 
 chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
@@ -282,14 +297,6 @@ function startRequest(params) {
 
     if (selectedSource) {
         selectedSource.refresh();
-        //selectedSource.refresh(
-        //  function (count) {
-        //      //console.log("success: " + count);
-        //  },
-        //  function () {
-        //      //console.log("error!!");
-        //  }
-        //);
     }
 }
 

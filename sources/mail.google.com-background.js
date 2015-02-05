@@ -188,16 +188,13 @@
     }
 
     function onTabInit(tabId) {
-        console.log('init called', tabId);
         var tmpProfileTypeName = tabs[tabId];
         if (tmpProfileTypeName) {
 
             chrome.tabs.sendMessage(tabId, { 'action': 'resetSource', 'profileType': availableSites[tmpProfileTypeName] }, function (closeWindow) {
-                console.log('resetSource callback called', tabId);
                 if (closeWindow) {
                     // TODO: have site specific logic here..
                     // TODO: let content script return what type it found..
-                    console.info('link in email:', closeWindow);
                     chrome.tabs.update(tabId, { 'url': closeWindow });
                 } else {
                     console.error('nothing returned from resetSource');

@@ -43,8 +43,15 @@ if (window == top) {
         var isMatch = !!match;
         if (isMatch) {
             var tmpNOfEmails = parseInt(match[1]);
-            if (tmpNOfEmails != nOfEmails) {
+            if (tmpNOfEmails > nOfEmails) {
                 console.log('number of emails: ' + tmpNOfEmails, ', we should do somthing when it increases');
+                chrome.runtime.sendMessage({
+                    'action': 'sourceRefresh',
+                    'hostname': document.location.hostname
+                });
+            }
+
+            if (tmpNOfEmails != nOfEmails) {
                 nOfEmails = tmpNOfEmails;
             }
         }
