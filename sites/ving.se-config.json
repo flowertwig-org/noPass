@@ -1,0 +1,11 @@
+﻿{
+    "name": "Ving.se",
+    "hostname": "ving.se",
+    "remindEmail": "noreply@ving.se",
+    "remindEmailHeader": "Glömt ditt lösenord/Uppdatera ditt lösenord",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='http://www.ving.se/renewpassword']",
+    "remindUrl": "http://www.ving.se/login"
+}
