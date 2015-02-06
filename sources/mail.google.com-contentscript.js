@@ -18,7 +18,7 @@ function doWhenGmailIsLoaded(callback) {
     if (loading) {
         setTimeout(function () {
             doWhenGmailIsLoaded(callback);
-        }, 500);
+        }, 1000);
     } else {
         callback();
     }
@@ -91,7 +91,7 @@ if (window == top) {
                         };
                         setTimeout(function () {
                             doWhenGmailIsLoaded(work);
-                        }, 500);
+                        }, 1000);
                         return true;
                     }
                 }
