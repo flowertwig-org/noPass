@@ -17,7 +17,6 @@ if (window == top) {
             if (progress.currentTab != options.tabId) {
                 return;
             }
-            console.log('same tab');
 
             switch (progress.status) {
                 case 'remindPass':
@@ -32,17 +31,25 @@ if (window == top) {
 
                             chrome.runtime.sendMessage({
                                 'action': 'updateStatus',
-                                'status': 'changeDefaultPass'
+                                'status': 'remindPass2'
                             }, function () {
                                 btn.click();
-                                setTimeout(function () {
-                                    chrome.runtime.sendMessage({
-                                        'action': 'closeTab',
-                                        'tabId': progress.currentTab
-                                    });
-                                }, 1000);
                             });
                         }
+                    }
+                    break;
+                case 'remindPass2':
+                    var address = '' + document.location;
+                    if (address.indexOf('/password_reset') >= 0) {
+                        chrome.runtime.sendMessage({
+                            'action': 'updateStatus',
+                            'status': 'changeDefaultPass'
+                        }, function () {
+                            chrome.runtime.sendMessage({
+                                'action': 'closeTab',
+                                'tabId': progress.currentTab
+                            });
+                        });
                     }
                     break;
                 case 'changeDefaultPass':
@@ -90,19 +97,22 @@ if (window == top) {
                                 userPassElement.val(progress.data);
                                 var form = userPassElement.parents('form');
                                 var btn = form.find('[type="submit"]');
-                                btn.click();
-
-                                setTimeout(function () {
-                                    chrome.runtime.sendMessage({
-                                        'action': 'loginDone'
-                                    });
-                                }, 1000);
+                                chrome.runtime.sendMessage({
+                                    'action': 'updateStatus',
+                                    'status': 'loginFinished'
+                                }, function () {
+                                    btn.click();
+                                });
                             }
                         }
                     }
                     break;
+                case 'loginFinished':
+                    chrome.runtime.sendMessage({
+                        'action': 'loginDone'
+                    });
+                    break;
             }
-            console.log('matched', JSON.stringify(arguments));
         });
     });
 }
