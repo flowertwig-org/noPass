@@ -38,19 +38,6 @@ function onSourceRefresh(hostName, tabId, sendResponse) {
     if (selectedSource) {
         selectedSource.refresh();
     }
-    //var pageTypeId = getPageTypeByHostName(hostName);
-    //var selectedPageType = types[pageTypeId];
-
-    //switch (selectedPageType.type) {
-    //    case 'source':
-    //        var source = availableSources[selectedPageType.hostname];
-    //        if (source) {
-    //            source.refresh();
-    //        }
-    //        break;
-    //    default:
-    //        break;
-    //}
 }
 
 function onUpdateStatus(tabId, status, sendResponse) {
