@@ -5,6 +5,11 @@
     },
     "content_scripts": [
         {
+            "matches": [ "*://*.facebook.com/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/facebook.com-contentscript.js" ],
+            "run_at":  "document_start"
+        },
+        {
             "matches": [ "*://*.github.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ],
             "run_at":  "document_start"

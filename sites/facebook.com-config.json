@@ -3,6 +3,9 @@
     "hostname": "facebook.com",
     "remindEmail": "password+osscyc69@facebookmail.com",
     "remindEmailHeader": "Somebody requested a new password for your Facebook account",
-    "remindEmailDataSelector": "",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='https://www.facebook.com/recover/code']",
     "remindUrl": "https://www.facebook.com/login/identify?ctx=recover"
 }
