@@ -67,10 +67,6 @@ if (window == top) {
                                     chrome.runtime.sendMessage({
                                         'action': 'loginDone'
                                     });
-                                    //chrome.runtime.sendMessage({
-                                    //    'action': 'closeTab',
-                                    //    'tabId': progress.currentTab
-                                    //});
                                 }, 2000);
                             });
                         });
