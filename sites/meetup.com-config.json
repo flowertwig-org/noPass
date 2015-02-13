@@ -1,0 +1,11 @@
+﻿{
+    "name": "Meetup.com",
+    "hostname": "meetup.com",
+    "remindEmail": "support@meetup.com",
+    "remindEmailHeader": "Meetup.com Password Request",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='https://secure.meetup.com/account/password/']",
+    "remindUrl": "http://www.meetup.com/account/forgot/"
+}
