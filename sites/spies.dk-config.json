@@ -1,0 +1,11 @@
+﻿{
+    "name": "Spies.dk",
+    "hostname": "spies.dk",
+    "remindEmail": "info@spies.dk",
+    "remindEmailHeader": "Glemt password",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='http://www.spies.dk/forny-password']",
+    "remindUrl": "http://www.spies.dk/log-ind"
+}
