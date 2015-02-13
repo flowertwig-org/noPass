@@ -17,7 +17,6 @@ if (window == top) {
             if (progress.currentTab != options.tabId) {
                 return;
             }
-            //console.log('same tab');
 
             switch (progress.status) {
                 case 'remindPass':
@@ -35,19 +34,19 @@ if (window == top) {
                                 'status': 'changeDefaultPass'
                             }, function () {
                                 btn.click();
-                                setTimeout(function () {
-                                    chrome.runtime.sendMessage({
-                                        'action': 'closeTab',
-                                        'tabId': progress.currentTab
-                                    });
-                                }, 1000);
                             });
                         }
                     }
                     break;
                 case 'changeDefaultPass':
                     var address = '' + document.location;
-                    if (address.indexOf('/reset-password') >= 0) {
+                    if (address.indexOf('/uas/emailsent') >= 0) {
+                        chrome.runtime.sendMessage({
+                            'action': 'closeTab',
+                            'tabId': progress.currentTab
+                        });
+                    }
+                    else if (address.indexOf('/reset-password') >= 0) {
                         chrome.runtime.sendMessage({
                             'action': 'genPass'
                         }, function (pass) {
@@ -80,7 +79,6 @@ if (window == top) {
                     }
                     break;
             }
-            console.log('matched', JSON.stringify(arguments));
         });
     });
 }
