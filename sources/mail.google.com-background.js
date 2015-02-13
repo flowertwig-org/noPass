@@ -121,6 +121,10 @@
                             var profileType = availableSites[profileTypeName];
                             if (profileType.remindEmail === resetEntry.sender) {
                                 switch (profileType.remindEmailHeaderMatch) {
+                                    case 'any':
+                                        resetEntry.profileType = profileType;
+                                        found = true;
+                                        break
                                     case 'contains':
                                         if (resetEntry.title.indexOf(profileType.remindEmailHeader) >= 0) {
                                             resetEntry.profileType = profileType;

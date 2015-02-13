@@ -1,0 +1,11 @@
+﻿{
+    "name": "Twitter.com",
+    "hostname": "twitter.com",
+    "remindEmail": "password@twitter.com",
+    "remindEmailHeader": "",
+    "remindEmailHeaderMatch": "any",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='https://twitter.com/account/confirm_email_reset']",
+    "remindUrl": "https://twitter.com/account/begin_password_reset"
+}

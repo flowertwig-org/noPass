@@ -8,8 +8,9 @@
         "loopia.se",
         "netflix.com",
         "plex.tv",
-        "tele2.se",
         "spotify.com",
+        "tele2.se",
+        "twitter.com",
         "ving.se"
     ],
     "sources": [ "mail.google.com" ]
