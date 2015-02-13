@@ -35,6 +35,11 @@
             "run_at":  "document_start"
         },
         {
+            "matches": [ "*://*.tjareborg.fi/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/tjareborg.fi-contentscript.js" ],
+            "run_at":  "document_start"
+        },
+        {
             "matches": [ "*://*.twitter.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/twitter.com-contentscript.js" ],
             "run_at":  "document_start"
@@ -62,6 +67,7 @@
                 "*://*.codeproject.com/*",
                 "*://*.spies.dk/*",
                 "*://*.spotify.com/*",
+                "*://*.tjareborg.fi/*",
                 "*://*.twitter.com/*",
                 "*://*.ving.no/*",
                 "*://*.ving.se/*"

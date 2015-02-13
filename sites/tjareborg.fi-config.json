@@ -1,0 +1,11 @@
+﻿{
+    "name": "Tjareborg.fi",
+    "hostname": "tjareborg.fi",
+    "remindEmail": "noreply@info.tjareborg.fi",
+    "remindEmailHeader": "Salasanasi",
+    "remindEmailHeaderMatch": "contains",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='http://www.tjareborg.fi/muuta-salasanaa']",
+    "remindUrl": "http://www.tjareborg.fi/login"
+}
