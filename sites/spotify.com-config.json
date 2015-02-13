@@ -1,0 +1,11 @@
+﻿{
+    "name": "Spotify.com",
+    "hostname": "spotify.com",
+    "remindEmail": "account-admin@news.spotifymail.com",
+    "remindEmailHeader": "Reset your password",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='/email-reset/']",
+    "remindUrl": "https://www.spotify.com/se/password-reset/"
+}

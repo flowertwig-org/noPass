@@ -20,6 +20,11 @@
             "run_at":  "document_start"
         },
         {
+            "matches": [ "*://*.spotify.com/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/spotify.com-contentscript.js" ],
+            "run_at":  "document_start"
+        },
+        {
             "matches": [ "*://*.ving.se/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/ving.se-contentscript.js" ],
             "run_at":  "document_start"
@@ -35,6 +40,7 @@
                 "*://*.loopia.se/*",
                 "*://*.tele2.se/*",
                 "*://*.codeproject.com/*",
+                "*://*.spotify.com/*",
                 "*://*.ving.se/*"
             ],
             "js": [ "libs/jquery-1.11.1.min.js", "contentscript.js" ],
