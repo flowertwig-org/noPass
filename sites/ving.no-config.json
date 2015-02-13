@@ -1,0 +1,11 @@
+﻿{
+    "name": "Ving.no",
+    "hostname": "ving.no",
+    "remindEmail": "info@ving.no",
+    "remindEmailHeader": "Passord - ving.no",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='http://www.ving.no/renewpassword']",
+    "remindUrl": "http://www.ving.no/logg-inn"
+}
