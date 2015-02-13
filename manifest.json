@@ -30,6 +30,11 @@
             "run_at":  "document_start"
         },
         {
+            "matches": [ "*://*.plex.tv/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/plex.tv-contentscript.js" ],
+            "run_at":  "document_start"
+        },
+        {
             "matches": [ "*://*.spies.dk/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/spies.dk-contentscript.js" ],
             "run_at":  "document_start"

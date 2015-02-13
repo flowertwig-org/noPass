@@ -1,8 +1,11 @@
-{
-    "name": "Plex",
+﻿{
+    "name": "Plex.tv",
     "hostname": "plex.tv",
-    "remindEmail": "",
-    "remindEmailHeader": "",
-    "remindEmailDataSelector": "",
+    "remindEmail": "noreply@plex.tv",
+    "remindEmailHeader": "Reset your password",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='https://plex.tv/users/password/edit?reset_password_token']",
     "remindUrl": "https://plex.tv/users/password/new"
 }
