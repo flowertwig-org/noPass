@@ -5,6 +5,11 @@
     },
     "content_scripts": [
         {
+            "matches": [ "*://*.dropbox.com/*" ],
+            "js": [ "libs/jquery-1.11.1.min.js", "sites/dropbox.com-contentscript.js" ],
+            "run_at":  "document_start"
+        },
+        {
             "matches": [ "*://*.facebook.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/facebook.com-contentscript.js" ],
             "run_at":  "document_start"
@@ -56,17 +61,18 @@
         },
         {
             "matches": [
+                "*://*.codeproject.com/*",
+                "*://*.dropbox.com/*",
                 "*://*.facebook.com/*",
                 "*://*.github.com/*",
                 "*://*.hbonordic.com/*",
-                "*://*.plex.tv/*",
-                "*://*.netflix.com/*",
                 "*://*.linkedin.com/*",
                 "*://*.loopia.se/*",
-                "*://*.tele2.se/*",
-                "*://*.codeproject.com/*",
+                "*://*.netflix.com/*",
+                "*://*.plex.tv/*",
                 "*://*.spies.dk/*",
                 "*://*.spotify.com/*",
+                "*://*.tele2.se/*",
                 "*://*.tjareborg.fi/*",
                 "*://*.twitter.com/*",
                 "*://*.ving.no/*",

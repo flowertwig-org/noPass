@@ -1,0 +1,11 @@
+﻿{
+    "name": "Dropbox.com",
+    "hostname": "dropbox.com",
+    "remindEmail": "no-reply@dropbox.com",
+    "remindEmailHeader": "Dropbox password reset",
+    "remindEmailHeaderMatch": "equal",
+    "remindEmailDataType": "element",
+    "remindEmailDataAttribute": "href",
+    "remindEmailDataSelector": "a[href*='/forgot']",
+    "remindUrl": "https://www.dropbox.com/forgot"
+}
