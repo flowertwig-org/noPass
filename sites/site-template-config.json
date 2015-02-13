@@ -3,6 +3,9 @@
     "hostname": "<hostname>",
     "remindEmail": "<email address used to send remind password emails>",
     "remindEmailHeader": "<email subject for remind password>",
-    "remindEmailDataSelector": "",
+    "remindEmailHeaderMatch": "<match method for matching remindEmailHeader (Available: 'equal', 'contains' and 'any')>",
+    "remindEmailDataType": "<way of finding data stored in email. Only 'element' can be used at this time>",
+    "remindEmailDataAttribute": "<if remindEmailDataType is equal to 'element' you can specify what attribute to read>",
+    "remindEmailDataSelector": "<if remindEmailDataType is equal to 'element' you should specify the jQuery selector to find your element>",
     "remindUrl": "<remind password url>"
 }
