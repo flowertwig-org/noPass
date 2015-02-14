@@ -29,7 +29,7 @@ As noPass is only using functionality already available for you or hackers on th
 But you should ensure that you are not automatically logged in to a email sourcce (like Gmail) by opening a browser window if you leave your computer where other people can access it.
 You should also make sure that the only password that you need to handle by yourself (the password to the email source) is a secure one.
 
-Please note that we are currently using a unique password (60 char long) for all sites supported by noPass.
+Please note that we are currently using a unique password (60 char long) for every site supported by noPass.
 In the future we will change that to better match the strongest password allowed for each site.
 
 ##Site Password Strenght##
