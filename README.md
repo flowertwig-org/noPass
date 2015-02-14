@@ -14,6 +14,10 @@ noPass solves this by using the password recovery functionality everytime you wa
 noPass also generates a new password for you when logged in to make sure that there is a secure password used and to minimize the risk if your credentials ever comes in to wrong hands (like when a site is being breached).
 Because noPass uses the password recovery functionality for the site it never stores any passwords making it more secure then other alternatives.
 
+##How to use noPass?##
+
+TBD
+
 ##How does noPass work?##
 
 When you want to login to a site supported by **noPass**, noPass triggers the password recovery functionality of the site in question.
