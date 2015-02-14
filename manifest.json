@@ -7,67 +7,67 @@
         {
             "matches": [ "*://*.dropbox.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/dropbox.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.facebook.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/facebook.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.github.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/github.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.loopia.se/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/loopia.se-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.linkedin.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/linkedin.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.meetup.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/meetup.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.plex.tv/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/plex.tv-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.spies.dk/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/spies.dk-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.spotify.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/spotify.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.tjareborg.fi/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/tjareborg.fi-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.twitter.com/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/twitter.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.ving.no/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/ving.no-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [ "*://*.ving.se/*" ],
             "js": [ "libs/jquery-1.11.1.min.js", "sites/ving.se-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [
@@ -90,14 +90,14 @@
                 "*://*.ving.se/*"
             ],
             "js": [ "libs/jquery-1.11.1.min.js", "contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         },
         {
             "matches": [
                 "*://*.google.com/*"
             ],
             "js": [ "libs/jquery-1.11.1.min.js", "sources/mail.google.com-contentscript.js" ],
-            "run_at":  "document_start"
+            "run_at": "document_start"
         }
     ],
     "description": "Extension handling passwords for your, so you don't have to.",
@@ -120,5 +120,6 @@
     "options_page": "setup.html",
     "content_security_policy": "default-src 'self'; style-src 'self'; connect-src *; frame-src 'self'",
     "version": "0.22",
+    "homepage_url":  "https://github.com/flowertwig-org/noPass",
     "manifest_version": 2
 }
