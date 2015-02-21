@@ -29,7 +29,7 @@ Because noPass uses the password recovery functionality for the site it never st
 	
 ###Every day use###
 
-On sites that noPass support, you will find this [![noPass logo](https://github.com/flowertwig-org/noPass/)](https://github.com/flowertwig-org/noPass/blob/master/resources/img/icon_128.png) symbol in the address bar.
+On sites that noPass support, you will find this [![noPass logo](https://github.com/flowertwig-org/noPass/blob/master/resources/img/icon_128.png)](https://github.com/flowertwig-org/noPass/blob/master/resources/img/icon_128.png) symbol in the address bar.
 By clicking the icon mentioned above you can enter your username/email (make sure it is correctly types and click update).
 If you already have your username/email here and want to login, the only thing you need todo is to press the login button.
 *Please note that for noPass to work you need to be logged in with the source choosed in the setup step before clicking the login button.*
