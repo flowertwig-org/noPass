@@ -2,7 +2,9 @@
 
 ##What is noPass?##
 
-TBD
+noPass is an account manager/password manager for Google Chrome simular to other tools like 1Password and KeePass.
+The big difference is that noPass never stores your passwords, it only makes sure you can log in to your sites when you want and that the accounts use safe passwords.
+Read below titles to know more.
 
 ##Why should you use noPass?##
 
@@ -16,7 +18,11 @@ Because noPass uses the password recovery functionality for the site it never st
 
 ##How to use noPass?##
 
-TBD
+###Setup###
+
+
+
+###Every day use###
 
 ##How does noPass work?##
 
@@ -36,8 +42,12 @@ You should also make sure that the only password that you need to handle by your
 Please note that we are currently using a unique password (60 char long) for every site supported by noPass.
 In the future we will change that to better match the strongest password allowed for each site.
 
-##Site Password Strenght##
+##Currently Supported Sites##
 
+Go to to below address to know currently supported sites.
+https://github.com/flowertwig-org/noPass/issues?q=label%3ASite+is%3Aclosed
+
+##Site Password Strenght##
 
 * **Facebook.com** - Full complexity, allows atleast 2048 char password. *(Updated: 2015-01-05)*
 * **GitHub.com** - Full complexity, only uses 72 char password (If more, rest will be ignored). *(Updated: 2015-01-05)*
