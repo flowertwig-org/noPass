@@ -20,7 +20,12 @@ Because noPass uses the password recovery functionality for the site it never st
 
 ###Setup###
 
-
+ 1. Clone or download repository to folder on your device (You can download it here: https://github.com/flowertwig-org/noPass/archive/master.zip)
+ 1. Open "chrome://extensions/" in Google Chrome.
+ 1. Make sure to check the checkbox "Developer mode".
+ 1. Click button "Load unpacked extension...".
+ 1. Go to the root folder for the repository you just cloned/downloaded.
+ 1. Go throuh the setup steps that should be displayed for you now.
 
 ###Every day use###
 
