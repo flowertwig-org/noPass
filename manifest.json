@@ -1,5 +1,9 @@
 {
     "author": "Mattias Flowertwig",
+    "name": "noPass",
+    "description": "Extension handling passwords for your, so you don't have to.",
+    "homepage_url":  "https://github.com/flowertwig-org/noPass",
+    "version": "0.22",
     "background": {
         "scripts": [ "background-common.js", "background.js", "sources/mail.google.com-background.js" ]
     },
@@ -100,11 +104,9 @@
             "run_at": "document_start"
         }
     ],
-    "description": "Extension handling passwords for your, so you don't have to.",
     "icons": {
         "128": "resources/img/icon_128.png"
     },
-    "name": "noPass",
     "permissions": [
         "alarms",
         "tabs",
@@ -119,7 +121,5 @@
     },
     "options_page": "setup.html",
     "content_security_policy": "default-src 'self'; style-src 'self'; connect-src *; frame-src 'self'",
-    "version": "0.22",
-    "homepage_url":  "https://github.com/flowertwig-org/noPass",
     "manifest_version": 2
 }
