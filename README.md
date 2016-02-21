@@ -66,7 +66,7 @@ In the future we will change that to better match the strongest password allowed
 Go to to below address to know currently supported sites.
 https://github.com/flowertwig-org/noPass/issues?q=label%3ASite+is%3Aclosed
 
-##Site Password Strenght##
+##Site Password Strength##
 
 * **Facebook.com** - Full complexity, allows atleast 2048 char password. *(Updated: 2015-01-05)*
 * **GitHub.com** - Full complexity, only uses 72 char password (If more, rest will be ignored). *(Updated: 2015-01-05)*
